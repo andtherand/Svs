@@ -19,6 +19,14 @@ abstract class Svs_Service_Abstract
 	// - PUBLIC
 	
 	/**
+	 * instantiates a new service and calls the init hook
+	 */
+	public function __construct()
+	{
+		$this->_init();
+	}
+	
+	/**
 	 * retrieves a set mapper or lazyloads and sets a mapper
 	 * 
 	 * @param	[string $prefix  for example the module name]
@@ -40,10 +48,11 @@ abstract class Svs_Service_Abstract
 				);	
 			}
 			
-			$mapper = new $mapperType();
+			$mapper = new $mapperType;
+			var_dump($mapper);
 			$this->setMapper($mapper);
-			
 		}
+		
 		return $this->_mapper;
 	}
 	
@@ -85,6 +94,11 @@ abstract class Svs_Service_Abstract
 	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
+	
+	/**
+	 * inits the service object
+	 */
+	abstract protected function _init();
 	
 	//-------------------------------------------------------------------------
 	// - PRIVATE
