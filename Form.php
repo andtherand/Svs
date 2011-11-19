@@ -115,8 +115,27 @@ class Svs_Form extends Zend_Form
               $elems[] = $this->$method();
 			}
         }
+		
+		$elems[] = $this->_addHashElem();
 		return $elems;
 	}
+	
+	/**
+	 * adds a security mechanism to the form to prevent csrf attacks
+	 * for a good explanation see http://de.wikipedia.org/wiki/Cross-Site_Request_Forgery
+	 * 
+	 * @return 	Zend_Form_Element_Hash
+	 */
+	private function _addHashElem()
+	{
+		$hash = new Zend_Form_Element_Hash('no_csrf');
+		$hash->setSalt('unique');
+		
+		return $hash;
+	}
+	
+	//-------------------------------------------------------------------------
+	// - PROTECTED
 	
 	/**
 	 * adds a submit button
