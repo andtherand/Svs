@@ -76,7 +76,7 @@ abstract class Svs_Service_Abstract
 		if(is_string($mapper)){
 			if(!class_exists($mapper)){
 				throw new Svs_Model_Exception(
-					sprintf('The given mapper %s does not exist'), $mapper
+					sprintf('The given mapper %s does not exist', $mapper)
 				);
 			}
 			$mapper = new $mapper();
@@ -103,7 +103,7 @@ abstract class Svs_Service_Abstract
 		if(is_string($form)){
 			if(!class_exists($form)){
 				throw new Svs_Model_Exception(
-					sprintf('The given form %s does not exist'), $form
+					sprintf('The given form %s does not exist', $form)
 				);
 			}
 			$form = new $form();
