@@ -49,7 +49,6 @@ abstract class Svs_Service_Abstract
 			}
 			
 			$mapper = new $mapperType;
-			var_dump($mapper);
 			$this->setMapper($mapper);
 		}
 		
