@@ -113,7 +113,6 @@ abstract class Svs_Model_EntityAbstract
 		}
 	} 
 	
-	
 	//-------------------------------------------------------------------------
 	// - MAGIC METHODS
 	
@@ -199,7 +198,7 @@ abstract class Svs_Model_EntityAbstract
 	public function toArray()
 	{
 		$arr = $this->_data;
-		$arr += array('id', $this->getId());
+		$arr += array('id' => $this->getId());
 		return $arr;
 	}
 

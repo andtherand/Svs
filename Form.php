@@ -14,6 +14,11 @@ class Svs_Form extends Zend_Form
 	 * @var array
 	 */
 	protected $_submitAttribs = array();
+	
+	/**
+	 * @var bool
+	 */
+	protected $_isInUpdateMode = false;
 		
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -96,6 +101,36 @@ class Svs_Form extends Zend_Form
 		return $this;
 	}
 	
+	/**
+	 * sets the form into the update mode. adds a hidden id field to the form
+	 * provides a fluent interface
+	 * 
+	 * @param 	[bool $mode whether or not to set the update Mode]
+	 * @return	Svs_Form
+	 */
+	public function setUpdateMode($mode = false)
+	{
+		$this->_isInUpdateMode = $mode;
+		
+		if(true === $mode){
+			if(null !== ($idElem = $this->_addIdElem())){
+				$this->addElement($idElem);
+			}	
+		}
+				
+		return $this;
+	}
+	
+	/**
+	 * retrieves the status of the form
+	 * 
+	 * @return	bool
+	 */
+	public function hasUpdateMode()
+	{
+		return $this->_isInUpdateMode;
+	}
+	
 	//-------------------------------------------------------------------------
 	// - PRIVATE
 	
@@ -132,6 +167,20 @@ class Svs_Form extends Zend_Form
 		$hash->setSalt('unique');
 		
 		return $hash;
+	}
+	
+	/**
+	 * when in update mode and no id element has been added yet,
+	 * adds a hidden id form element to the form
+	 * 
+	 * @return Zend_Form_Element_Hidden | null
+	 */
+	private function _addIdElem()
+	{
+		if(null === $this->getElement('id')){
+			return new Zend_Form_Element_Hidden('id');
+		}
+		return null;
 	}
 	
 	//-------------------------------------------------------------------------

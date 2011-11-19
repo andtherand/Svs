@@ -8,6 +8,11 @@ interface Svs_Service_EditableInterface
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
+	/**
+	 * retrieves the form 
+	 */
+	public function getPopulatedForm($form);
+	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
