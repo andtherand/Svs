@@ -29,13 +29,20 @@ abstract class Svs_Service_Abstract
 	public function getMapper($prefix = null, $type = null)
 	{
 		if(null === $this->_mapper && null !== $prefix && null !== $type){
-			$mapper = sprintf('%s_Model_DataMapper_%s', $prefix, $type);
-			if(class_exists($mapper)){ 
-				$this->setMapper($mapper);
+			$mapperType = sprintf('%s_Model_DataMapper_%s', $prefix, $type);
+			
+			if(!class_exists($mapperType)){ 
+				throw new Svs_Model_Exception(
+					sprintf(
+						'The given DataMapper %s does not exist',
+						$mapperType
+					)
+				);	
 			}
-			throw new Svs_Model_Exception(
-				sprintf('The given DataMapper %s does not exist', $mapper)
-			);
+			
+			$mapper = new $mapperType();
+			$this->setMapper($mapper);
+			
 		}
 		return $this->_mapper;
 	}
