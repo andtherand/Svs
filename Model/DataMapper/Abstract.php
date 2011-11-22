@@ -9,11 +9,41 @@ abstract class Svs_Model_DataMapper_Abstract
 	 * @var Zend_Db_Table_Abstract
 	 */
 	protected $_dbTable;
+	
+	/**
+	 * 	holds sql strings for debug reasons 
+	 *  @var array
+	 */
+	protected $_selects = array();
 		 
 	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
+	/**
+	 * adds a select statement to the selects array
+	 * provides a fluid interface
+	 * 
+	 * @param	Zend_Db_Table_Select $select the select query
+	 * @return  Svs_Model_DataMapper_Abstract 
+	 */
+	public function addSelect($select)
+	{
+		if(!in_array($select, $this->_selects)){
+			$this->_selects[] = (string)$select;
+		}
+		return $this;
+	}
+	
+	/**
+	 * exposes the called sql strings
+	 * 
+	 * @return 	array
+	 */
+	public function exposeSelects()
+	{
+		return $this->_selects;
+	}
 	
 	/**
 	 * creates a new instance of the mapper
@@ -120,8 +150,14 @@ abstract class Svs_Model_DataMapper_Abstract
 	private function _extractCriteria($criteria, $select, $operator){
 		
 		foreach($criteria as $wrapper => $condition){
-			$tmpKey = key($condition);
-			$select->where($tmpKey, $condition[$tmpKey]);
+			
+			if(is_array($condition)){
+				$tmpKey = key($condition);
+				$select->$operator($tmpKey, $condition[$tmpKey]);
+				
+			} else {
+				$select->$operator($condition);
+			} 
 		}
 		return $select;
 	}

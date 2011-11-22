@@ -56,6 +56,11 @@ class Svs_Form extends Zend_Form
 	 */
 	public function setSubmitLabel($str)
 	{
+		$s = $this->getElement('submit');
+		if($s instanceof Zend_Form_Element_Submit){
+			$s->setLabel($str);	
+		}
+				
 		$this->_submitLabel = $str;
 		return $this;
 	} 
@@ -130,7 +135,7 @@ class Svs_Form extends Zend_Form
 	{
 		return $this->_isInUpdateMode;
 	}
-	
+		
 	//-------------------------------------------------------------------------
 	// - PRIVATE
 	
@@ -150,8 +155,8 @@ class Svs_Form extends Zend_Form
               $elems[] = $this->$method();
 			}
         }
+		$this->_addHashElem();
 		
-		$elems[] = $this->_addHashElem();
 		return $elems;
 	}
 	

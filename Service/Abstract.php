@@ -21,6 +21,13 @@ abstract class Svs_Service_Abstract
 	protected $_form; 
 	
 	/**
+	 * the form type to instantiate 
+	 * 
+	 * @var 	string
+	 */
+	protected $_formType;
+	
+	/**
 	 * hands over the params to the service layer with the result of a really thin
 	 * contoller
 	 * 
@@ -126,13 +133,28 @@ abstract class Svs_Service_Abstract
 	 */
 	public function getForm($prefix = null, $type = null)
 	{
-		if(null === $this->_form && null !== $prefix && null !== $type){
-			try {
-				$this->setForm(sprintf('%s_Form_%s', $prefix, $type));
-				
-			} catch(Svs_Model_Exception $e){
-				throw $e;
-			}
+		$form = null;
+		
+		// a form already exists so return immediately
+		if(null !== $this->_form){
+			return $this->_form;
+		}		
+		
+		// if a type is defined take it
+		if(null !== $this->_formType){
+			$form = $this->_formType;	
+		}
+		
+		// if a lazy load get should be peformed 
+		if(null === $form && null !== $prefix && null !== $type){
+			$form = sprintf('%s_Form_%s', $prefix, $type);
+		}
+		
+		try {
+			$this->setForm($form);
+			
+		} catch(Svs_Model_Exception $e){
+			throw $e;
 		}
 		
 		return $this->_form;
