@@ -21,6 +21,16 @@ abstract class Svs_Model_DataMapper_Abstract
 	// - PUBLIC
 	
 	/**
+	 * creates a new instance of the mapper
+	 * and calls the init hook
+	 */
+	public function __construct()
+	{
+		$this->_init();
+	}
+	
+	
+	/**
 	 * adds a select statement to the selects array
 	 * provides a fluid interface
 	 * 
@@ -43,15 +53,6 @@ abstract class Svs_Model_DataMapper_Abstract
 	public function exposeSelects()
 	{
 		return $this->_selects;
-	}
-	
-	/**
-	 * creates a new instance of the mapper
-	 * and calls the init hook
-	 */
-	public function __construct()
-	{
-		$this->_init();
 	}
 	
 	/**
@@ -98,6 +99,16 @@ abstract class Svs_Model_DataMapper_Abstract
 		return $this->_dbTable;
     }
 	
+	/**
+	 * returns a select object to query 
+	 * 
+	 * @return 	Zend_DbTable_Select
+	 */
+	public function getSelect()
+	{
+		return $this->getDbTable()->select();
+	}
+	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
@@ -121,7 +132,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	{
 		if(!is_array($criteriaArray)){
 			throw new Svs_Model_Exception(
-				'No criteria given,unable to build select'
+				'No criteria given, unable to build select'
 			);
 		}
 		
@@ -150,15 +161,18 @@ abstract class Svs_Model_DataMapper_Abstract
 	private function _extractCriteria($criteria, $select, $operator){
 		
 		foreach($criteria as $wrapper => $condition){
-			
+			#var_dump($wrapper);
 			if(is_array($condition)){
-				$tmpKey = key($condition);
+				$tmpKey = key($condition); // conditions like 'id < ?'  
 				$select->$operator($tmpKey, $condition[$tmpKey]);
 				
 			} else {
+				
 				$select->$operator($condition);
+			#	var_dump($condition);
 			} 
 		}
+		#exit;
 		return $select;
 	}
 	

@@ -40,7 +40,11 @@ class Svs_Form extends Zend_Form
 	{
 		$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 		$action = $baseUrl . $this->_action;
-				
+		
+		if(isset($this->_id)){
+			$this->setAttrib('id', $this->_id);
+		}
+		
 		$this->setAction($action)
 			 ->setMethod(self::METHOD_POST);
 		

@@ -1,4 +1,4 @@
 <?php
 
-class Svs_Model_Exception extends Zend_Exception 
+class Svs_Model_Exception extends Svs_Exception 
 {}

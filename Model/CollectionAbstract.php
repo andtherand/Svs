@@ -27,6 +27,15 @@ abstract class Svs_Model_CollectionAbstract implements Iterator, Countable, Arra
 		return $this;
 	}
 	
+	/**
+	 * checks if the collection is empty
+	 * 
+	 * @return 	bool
+	 */
+	public function isEmpty()
+	{
+		return empty($this->_collection);
+	}
 	
 	/**
 	 * resets the collection
