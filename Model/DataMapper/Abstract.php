@@ -15,7 +15,9 @@ abstract class Svs_Model_DataMapper_Abstract
 	 *  @var array
 	 */
 	protected $_selects = array();
-		 
+	
+	
+	protected $_db;
 	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -104,9 +106,9 @@ abstract class Svs_Model_DataMapper_Abstract
 	 * 
 	 * @return 	Zend_DbTable_Select
 	 */
-	public function getSelect()
+	public function getSelect($from = Zend_Db_Table::SELECT_WITHOUT_FROM_PART)
 	{
-		return $this->getDbTable()->select();
+		return $this->getDbTable()->select($from);
 	}
 	
 	//-------------------------------------------------------------------------
@@ -117,7 +119,8 @@ abstract class Svs_Model_DataMapper_Abstract
 	 * to be overriden by subclass
 	 */
 	protected function _init()
-	{		
+	{
+		$this->_db = $this->getDbTable()->getAdapter();		
 	}
 	
 	/**

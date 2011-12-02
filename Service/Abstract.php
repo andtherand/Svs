@@ -167,7 +167,7 @@ abstract class Svs_Service_Abstract
 			$default = null;
 		}
 		
-		if(null === $r && null === $this->_request){
+		if(null === $r && null === $this->_request && null === $default){
 			throw new Svs_Service_Exception('No request provided');
 		}
 		
@@ -176,7 +176,7 @@ abstract class Svs_Service_Abstract
 		}
 		
 		$rParam = $this->_request->getParam($param, $default); 	
-		if(null === $rParam){
+		if(null === $rParam && null === $default){
 			throw new Svs_Service_Exception(sprintf(
 				'No parameter <i>%s</i> provided by this request', $param)
 			);	

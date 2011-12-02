@@ -72,14 +72,28 @@ class Svs_Json_GData_Rows
 	 * adds a bulk of cells to the row
 	 * 
 	 * @param	array $cells an array of arrays to set the cells at once
+	 * @param	[int $row when to set a break]
 	 * @return	Svs_Json_GData_Rows
 	 */
-	public function addCells(array $cells)
+	public function addCells(array $cells, $row = null)
 	{
 		foreach($cells as $wrapper => $cell){
-			$this->addCell($cell);
+			
+			if(is_array($cell)){
+				foreach($cell as $namedCell => $cll){
+					$this->addCell($cll);
+				}
+			} else {
+				$this->addCell($cell);
+			}
+			
+			if($this->countCells() == $row){
+				$this->addRow();
+			}
 		}
+		
 		return $this;
+		
 	}
 	
 	
@@ -144,7 +158,7 @@ class Svs_Json_GData_Rows
 	 */
 	public function __toString()
 	{
-		return '{"c":' . implode('},{"c":', $this->_rows) . '}';
+		return sprintf('{"c":%s}', implode('},{"c":', $this->_rows));
 	}
 	
 	//-------------------------------------------------------------------------

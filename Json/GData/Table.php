@@ -101,7 +101,8 @@ class Svs_Json_GData_Table
 	public function addRows(array $cells)
 	{
 		if($this->hasColumns()){
-			$this->_rows->addCells($cells);
+			
+			$this->_rows->addCells($cells, $this->countColumns());
 			
 			if($this->countCellsPerRow() == $this->countColumns()){
 				$this->_rows->addRow();
@@ -174,9 +175,19 @@ class Svs_Json_GData_Table
 	 */
 	public function __toString()
 	{
-		$str = '"cols":[' . implode(',', $this->_columns) . '],';
-		$str .= '"rows":[' . $this->_rows . ']';
-		return '{' . $str . '}';
+		$str = sprintf('"cols":[%s],', implode(',', $this->_columns));
+		$str .= sprintf('"rows":[%s]', $this->_rows);
+		return sprintf('{%s}', $str);
+	}
+	
+	/**
+	 * a verbose cast to string uses the magic method __toString internally
+	 * 
+	 * @return	string  
+	 */
+	public function toString()
+	{
+		return (string)$this;
 	}	
 	
 	//-------------------------------------------------------------------------
