@@ -34,13 +34,21 @@ class Svs_View_Helper_MultiCheckbox extends Svs_View_Helper_RadioButton
     public function multiCheckbox($name, $value = null, $attribs = null,
         $options = null, $listsep = "\n")
     {
-    	$class = 'multi-checkboxes';
-    	if(isset($attribs['ulClass'])){
-    		$class .= ' ' . $attribs['ulClass'];
-			unset($attribs['ulClass']);
+		$htmlAttribs = array(
+			'class' => 'multi-checkboxes'
+		);
+
+    	if(isset($attribs['class'])){
+    		$htmlAttribs['class'] .= ' ' . $attribs['class'];
+			unset($attribs['class']);
     	}
 		
-    	$html = sprintf('<ul class="%s">', $class);
+		if(isset($attribs['id'])){
+			$htmlAttribs['id'] = $attribs['id']; 	
+			unset($attribs['id']);
+		}			
+		
+    	$html = sprintf('<ul %s>', $this->_htmlAttribs($htmlAttribs));
     	$html .= $this->radioButton($name, $value, $attribs, $options, "");
 		$html .= '</ul>';
         return $html;

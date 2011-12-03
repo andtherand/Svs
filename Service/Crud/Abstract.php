@@ -7,6 +7,12 @@ abstract class Svs_Service_Crud_Abstract
 	//-------------------------------------------------------------------------
 	// - VARS
 	
+	/**
+	 * @var string the label to be shown on the submit button in edit state 
+	 * 
+	 */
+	protected $_editLabel = 'Save';
+	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
@@ -70,11 +76,33 @@ abstract class Svs_Service_Crud_Abstract
 		$form = $this->_buildForm($this->_formType, $flag);
 		
 		if($flag){
-			$form->setSubmitLabel('Service editieren');
+			$form->setSubmitLabel($this->_editLabel);
 			$form->populate($this->findById()->toArray());
 		}
 		
 		return $form;		
+	}
+	
+	/**
+	 * sets the label for the edit state of the submit button
+	 * provides a fluid interface
+	 * 
+	 * @param	string $label the label to set
+	 * @return 	Svs_Service_Crud_Abstract
+	 */
+	public function setEditLabel($label)
+	{
+		$this->_editLabel = $label;
+		return $this;
+	}
+	
+	/**
+	 * gets the edit label
+	 * @return 	string	
+	 */
+	public function getEditLabel()
+	{
+		return $this->_editLabel;
 	}
 	
 	//-------------------------------------------------------------------------

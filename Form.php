@@ -19,6 +19,8 @@ class Svs_Form extends Zend_Form
 	 * @var bool
 	 */
 	protected $_isInUpdateMode = false;
+	
+	protected $_preventCSRF = true;
 		
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -159,7 +161,10 @@ class Svs_Form extends Zend_Form
               $elems[] = $this->$method();
 			}
         }
-		$this->_addHashElem();
+		
+		if(true === $this->_preventCSRF){
+			$elems[] = $this->_addHashElem();
+		}
 		
 		return $elems;
 	}
@@ -202,10 +207,11 @@ class Svs_Form extends Zend_Form
 	 */
 	protected function _pushSubmit()
 	{
-		$s = new Zend_Form_Element_Submit('submit');
-		$s->setAttribs($this->_submitAttribs);
-		$s->setLabel($this->_submitLabel);
-		$s->setIgnore(true);
+		$s = new Zend_Form_Element_Button('submit');
+		$s->setAttribs($this->_submitAttribs)
+		  ->setAttrib('type', 'submit')
+		  ->setLabel($this->_submitLabel)
+		  ->setIgnore(true);
 		return $s;
 	}
 }
