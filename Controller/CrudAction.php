@@ -13,7 +13,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	/**
 	 * @var string the default route to use for redirects
 	 */
-	protected $_defaultRedirectRoute =  'listService';
+	protected $_defaultRedirectRoute =  'list';
 	
 	/**
 	 * @var string the message to be shown after an update or create action
@@ -26,34 +26,62 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	protected $_deleteMessage = 'Erfolgreich gelöscht.';
 	
 	/**
-	 * @var Zend_Controller_Action_Helper_FlashMessenger
+	 * @var string the folder to llok for all the view scripts that are shared
 	 */
-	private $_flashMessenger = null;
+	protected $_viewFolder = 'crud';
 	
 	/**
-	 * @var Zend_Session_Namespace
+	 * @var string the name of the controller
 	 */
-	private $_namespace;
+	protected $_controller = null;
+	
+	/**
+	 * @var string the name of the current module
+	 */
+	protected $_module = null;
 	
 	/**
 	 * @var Zend_Controller_Action_Helper_Redirector
 	 */
-	private $_redirector;
+	protected $_redirector = null;
 	
+	/**
+	 * @var Zend_Controller_Action_Helper_FlashMessenger
+	 */
+	protected $_flashMessenger = null;
+	
+	/**
+	 * @var Zend_Session_Namespace
+	 */
+	protected $_namespace = null;
+	
+	/**
+	 * @var Zend_Controller_Action_Helper_ViewRenderer
+	 */
+	protected $_viewRenderer = null;
 	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
 	/**
 	 * the init hook
+	 * inits serveral helper and variables in the controller
 	 */
 	public function init()
 	{
-	  	$this->_service->setRequest($this->getRequest());
+		$request = $this->getRequest();
+		$this->_controller 	= strtolower($request->getControllerName());
+		$this->_module 		= strtolower($request->getModuleName()); 
 		
+		$this->_service->setURLChunks(
+			$this->_module, $this->_controller 
+		);
+		
+		$this->_namespace 		= new Zend_Session_Namespace('crud');		
 		$this->_flashMessenger 	= $this->getHelper('FlashMessenger');
-		$this->_namespace 		= new Zend_Session_Namespace('crud');
 		$this->_redirector 		= $this->getHelper('redirector');
+		$this->_viewRenderer	= $this->getHelper('viewRenderer');
+	
 	}
 	
 	/**
@@ -73,7 +101,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		if(!empty($message)){
 			$this->view->placeholder('flashMessenger')->set(
 					sprintf(
-						'<div class="success grid_4">%s</div>', $message[0]
+						'<div class="success">%s</div>', $message[0]
 				)
 			);
 			$this->_flashMessenger->clearMessages();
@@ -81,8 +109,21 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 			$this->_namespace->noBackButton = true;
 			$this->_namespace->setExpirationHops(1); 
 		}
+		    	
 		
-    	$this->_helper->paginator($this->_service->findAll(), 10);
+		$this->view->assign(array(
+				'partialName' => sprintf(
+					'partials/%s-list.phtml', $this->_controller),
+				'controller' => $this->_controller
+			)
+		);
+		
+		/**
+		 * @var Svs_Controller_Action_Helper_Paginator
+		 */
+		$this->_helper->paginator($this->_service->findAll(), 10);	
+		
+		$this->_viewRenderer->render($this->_viewFolder . '/list', null, true);
     }
 	
 	/**
@@ -91,11 +132,16 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     public function showAction()
     {
     	try {
-    		$this->view->entity = $this->_service->findById();
+    		$requestId = $this->getRequest()->getParam('id'); 
+    		$this->view->entity = $this->_service->findById($requestId);
 			
-    	} catch(Svs_Model_Exception $e){
+    	} catch(Svs_Service_Exception $e){
     		throw $e;
     	}
+		$this->view->partialName = sprintf(
+			'partials/%s-show.phtml', $this->_controller
+		);
+		$this->_viewRenderer->render($this->_viewFolder . '/show', null, true);
     }
 	
 	/**
@@ -103,15 +149,17 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
      */
     public function newAction()
     {
+    	$this->_helper->noCacheHeader();
+		
     	// check if the backButton is diabled if so redirect	
 		if(isset($this->_namespace->noBackButton)){
 			$this->_redirector->gotoRouteAndExit(
-				array(), $this->_defaultRedirectRoute
+				array('controller' => $this->_controller), 
+				$this->_defaultRedirectRoute
 			);
 		}
-		
-    	$this->view->form =	$this->_service->getPopulatedForm(false);
-        $this->render('form');
+    	$this->view->form =	$this->_service->getPopulatedForm(null, false);
+       	$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
     }
 	
 	 /**
@@ -119,8 +167,9 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
      */
     public function editAction()
     {
-    	$this->view->form =	$this->_service->getPopulatedForm();
-		$this->render('form');
+    	$requestId = $this->getRequest()->getParam('id'); 
+    	$this->view->form =	$this->_service->getPopulatedForm($requestId);
+		$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
     }
 	
 	/**
@@ -136,7 +185,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     	// if request is get redirect to the list action
     	if(!$this->getRequest()->isPost()){
     		$this->_redirector->gotoRoute(
-    			array(), $this->_defaultRedirectRoute
+    			array('controller' => $this->_controller), 
+    			$this->_defaultRedirectRoute
 			);
     	}
 		
@@ -145,12 +195,13 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		// somethings gone wrong, so show the form again
 		if($result instanceof Zend_Form){
 			$this->view->form = $result;
-			$this->render('form');
+			$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
 			
 		} else {
 			$this->_flashMessenger->addMessage($this->_successMessage);
 			$this->_redirector->gotoRouteAndExit(
-				array(), $this->_defaultRedirectRoute
+				array('controller' => $this->_controller), 
+				$this->_defaultRedirectRoute
 			);
 			
 		} 	
@@ -161,8 +212,9 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	 */
     public function deleteAction()
     {
+    	$requestId = $this->getRequest()->getParam('id'); 
     	try {
-    		$id = $this->_service->delete();
+    		$id = $this->_service->delete($requestId);
 			
     	} catch(Svs_Model_Exception $e){
     		throw $e;
@@ -170,7 +222,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		
 		$this->_flashMessenger->addMessage($this->_deleteMessage);
        	$this->_redirector->gotoRouteAndExit(
-       		array(), $this->_defaultRedirectRoute
+       		array('controller' => $this->_controller), 
+       		$this->_defaultRedirectRoute
 		);
     }
 	

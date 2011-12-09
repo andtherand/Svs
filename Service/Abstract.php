@@ -48,24 +48,12 @@ abstract class Svs_Service_Abstract
 	 * if those checks fail throws Svs_Service_Exception @see below.
 	 * if everything goes well returns the specified domain object
 	 * 
-	 * @param 	[Zend_Controller_Request_Abstract|int $r the request 
-	 * 												 to look for an id]
-	 * @throws	Svs_Service_Exception when no request is given and no 
-	 * 								request has been explicitly been set
-	 * @throws	Svs_Service_Exception	when no id has been provided in the request
-	 * @return 	App_Model_Service
+	 * @param 	int $id the id of the entity to retrieve
+	 *
+	 * @return 	Svs_Model_Entity
 	 */
-	public function findById($r = null)
+	public function findById($id)
 	{
-		$id = $r;
-		if(!is_int($id)){
-			try {
-				$id = $this->_hasRequest('id', $r);
-				
-			} catch(Svs_Service_Exception $e){
-				throw $e;
-			}
-		} 				
 		return $this->_mapper->findById($id);
 	}
 	
@@ -121,69 +109,8 @@ abstract class Svs_Service_Abstract
 		return $this;
 	}
 	
-	/**
-	 * sets the current request object to handle logic in the service layer
-	 * provides a fluid interface
-	 * 
-	 * @param	Zend_Controller_Request_Abstract $r the current request object
-	 * @return	Svs_Service_Abstract
-	 */
-	public function setRequest(Zend_Controller_Request_Abstract $r)
-	{
-		$this->_request = $r;
-		return $this;
-	}
-	
-	/**
-	 * checks whether or not a request has been set
-	 * 
-	 * @return bool
-	 */
-	public function hasRequest()
-	{
-		return isset($this->_request);
-	}
-	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
-	
-	/**
-	 * helper function to keep things dry!
-	 * checks whether or not a request has been set and if the request has an 
-	 * id
-	 * 
-	 * @param	[string $param a param that should be retrieved from the request]
-	 * @param	[mixed $default a default value the request param should have]
-	 * @param	[Zend_Controller_Request_Abstract $r the specific request]
-	 * @throws	Svs_Service_Exception	when no request has been provided
-	 * @throws	Svs_Service_Exception	when no id could be found in the request
-	 * @return	int
-	 */
-	protected function _hasRequest($param = 'id', $default = null,
-		Zend_Controller_Request_Abstract $r = null
-	){
-		if($default instanceof Zend_Controller_Request_Abstract){
-			$r = $default;
-			$default = null;
-		}
-		
-		if(null === $r && null === $this->_request && null === $default){
-			throw new Svs_Service_Exception('No request provided');
-		}
-		
-		if(null !== $r){
-			$this->setRequest($r);
-		}
-		
-		$rParam = $this->_request->getParam($param, $default); 	
-		if(null === $rParam && null === $default){
-			throw new Svs_Service_Exception(sprintf(
-				'No parameter <i>%s</i> provided by this request', $param)
-			);	
-		}
-		
-		return $rParam;
-	}
 	
 	/**
 	 * inits the service object

@@ -40,14 +40,10 @@ interface Svs_Service_ReadableInterface
 	 * if those checks fail throws Model_Exception @see below.
 	 * if everything goes well returns the specified domain object
 	 * 
-	 * @param 	[Zend_Controller_Request_Abstract|int $r the request 
-	 * 												 to look for an id]
-	 * @throws	Svs_Model_Exception when no request is given and no 
-	 * 								request has been explicitly been set
-	 * @throws	Svs_Model_Exception	when no id has been provided in the request
+	 * @param 	int $id the id of the entity to retrieve
 	 * @return 	App_Model_Service
 	 */
-	public function findById($r = null);
+	public function findById($id);
 		
 	//-------------------------------------------------------------------------
 	// - PROTECTED

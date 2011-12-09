@@ -19,6 +19,6 @@ interface Svs_Model_DataMapper_ReadableInterface
 	 * @throws	Svs_Model_Exception	when criteria is not an array
 	 * @return	Svs_Model_CollectionAbstract|Iterator|Svs_Model_Entity|null
 	 */
-	public function search($criteria, $showSQL = false);
+	//public function search($criteria, $showSQL = false);
 	
 }

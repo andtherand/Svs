@@ -57,7 +57,7 @@ abstract class Svs_Service_Configurable_Abstract
 	 * 
 	 * @param	[string $prefix e.g. the module name]
 	 * @param	[string $type e.g. the controller name]
-	 * @throws 	Svs_Model_Exception when the given form does not exist
+	 * @throws 	Svs_Service_Exception when the given form does not exist
 	 * @return 	Zend_Form	
 	 */
 	public function getForm($prefix = null, $type = null)
@@ -82,7 +82,7 @@ abstract class Svs_Service_Configurable_Abstract
 		try {
 			$this->setForm($form);
 			
-		} catch(Svs_Model_Exception $e){
+		} catch(Svs_Service_Exception $e){
 			throw $e;
 		}
 		

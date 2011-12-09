@@ -6,7 +6,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	// - VARS
 	
 	/**
-	 * @var Zend_Db_Table_Abstract
+	 * @var 	Zend_Db_Table_Abstract
 	 */
 	protected $_dbTable;
 	
@@ -16,7 +16,9 @@ abstract class Svs_Model_DataMapper_Abstract
 	 */
 	protected $_selects = array();
 	
-	
+	/**
+	 * @var 	Zend_Db
+	 */
 	protected $_db;
 	
 	//-------------------------------------------------------------------------
@@ -30,8 +32,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	{
 		$this->_init();
 	}
-	
-	
+		
 	/**
 	 * adds a select statement to the selects array
 	 * provides a fluid interface
@@ -42,7 +43,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	public function addSelect($select)
 	{
 		if(!in_array($select, $this->_selects)){
-			$this->_selects[] = (string)$select;
+			$this->_selects[] = $select->toString();
 		}
 		return $this;
 	}
@@ -120,7 +121,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	 */
 	protected function _init()
 	{
-		$this->_db = $this->getDbTable()->getAdapter();		
+		//$this->_db = $this->getDbTable()->getAdapter();		
 	}
 	
 	/**
@@ -172,10 +173,8 @@ abstract class Svs_Model_DataMapper_Abstract
 			} else {
 				
 				$select->$operator($condition);
-			#	var_dump($condition);
 			} 
 		}
-		#exit;
 		return $select;
 	}
 	

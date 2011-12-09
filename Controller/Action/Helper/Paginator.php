@@ -19,9 +19,10 @@ class Svs_Controller_Action_Helper_Paginator
 	)
 	{
 		$view = $this->getActionController()->view;
-		
+				
 		Zend_Paginator::setDefaultScrollingStyle($scrollStyle);
 		$paginator = Zend_Paginator::factory($result);
+				
 		$paginator->setItemCountPerPage($itemsPerPage);
 		$paginator->setCurrentPageNumber(
 			$this->getRequest()->getParam('page', 1));

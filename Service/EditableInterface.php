@@ -11,21 +11,20 @@ interface Svs_Service_EditableInterface
 	
 	/**
 	 * retrieves the form
-	 * @param	Svs_Form $form
-	 * @return 	 
+	 * @param	[bool $flag indicates whether or not the form will be returned with populated data] 
+	 * @return 	Zend_Form 
 	 */
-	public function getPopulatedForm($form);
+	public function getPopulatedForm($id, $flag = true);
 	
 	/**
 	 * deletes a given entity by it´s id
 	 * 
-	 * @param 	[Zend_Controller_Request_Abstract $r the request 
-	 * 												 to look for an id]
+	 * @param 	int $id The id of the entity to delete
 	 * @throws	Svs_Model_Exception when no request is given and no 
 	 * 								request has been explicitly been set
 	 * @throws	Svs_Model_Exception	when no id has been provided in the request
 	 */
-	public function delete(Zend_Controller_Request_Abstract $r = null);
+	public function delete($id);
 	
 	/**
 	 * validates a post result 

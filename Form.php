@@ -16,10 +16,13 @@ class Svs_Form extends Zend_Form
 	protected $_submitAttribs = array();
 	
 	/**
-	 * @var bool
+	 * @var bool	whether or not to insert an id element
 	 */
 	protected $_isInUpdateMode = false;
 	
+	/**
+	 * @var bool	whether or not to have a hash to prevent csrf attacks
+	 */
 	protected $_preventCSRF = true;
 		
 	//-------------------------------------------------------------------------
@@ -32,6 +35,8 @@ class Svs_Form extends Zend_Form
 	 */
 	public function __construct($options = null)
 	{
+		$this->addPrefixPath(
+			'Svs_Form_Decorator', 'Svs/Form/Decorator', 'decorator');
 		parent::__construct($options);	
 	}
 	
@@ -114,6 +119,7 @@ class Svs_Form extends Zend_Form
 	
 	/**
 	 * sets the form into the update mode. adds a hidden id field to the form
+	 * and calls the _notifyUpdate Hook
 	 * provides a fluent interface
 	 * 
 	 * @param 	[bool $mode whether or not to set the update Mode]
@@ -128,7 +134,7 @@ class Svs_Form extends Zend_Form
 				$this->addElement($idElem);
 			}	
 		}
-				
+		$this->_notifyUpdate();				
 		return $this;
 	}
 	
@@ -141,7 +147,7 @@ class Svs_Form extends Zend_Form
 	{
 		return $this->_isInUpdateMode;
 	}
-		
+			
 	//-------------------------------------------------------------------------
 	// - PRIVATE
 	
@@ -200,6 +206,13 @@ class Svs_Form extends Zend_Form
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
+	/**
+	 * update hook @see 
+	 * to be implemented by class who are interested on the event
+	 */
+	protected function _notifyUpdate()
+	{}
+			
 	/**
 	 * adds a submit button
 	 * 

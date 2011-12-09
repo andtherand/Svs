@@ -13,6 +13,12 @@ abstract class Svs_Service_Crud_Abstract
 	 */
 	protected $_editLabel = 'Save';
 	
+	protected $_module = '';
+	
+	protected $_controller = '';
+	
+	protected $_action = 'process';
+	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
@@ -46,21 +52,11 @@ abstract class Svs_Service_Crud_Abstract
 	/**
 	 * deletes a given entity by it´s id
 	 * 
-	 * @param 	[Zend_Controller_Request_Abstract $r the request 
-	 * 												 to look for an id]
-	 * @throws	Svs_Model_Exception when no request is given and no 
-	 * 								request has been explicitly been set
-	 * @throws	Svs_Model_Exception	when no id has been provided in the request
+	 * @param 	int	$id The id of the entity to delete
+	 * @return	int $id the id which has bee deleted
 	 */
-	public function delete(Zend_Controller_Request_Abstract $r = null)
-	{
-		try {
-			$id = $this->_hasRequest('id', $r);
-			
-		} catch(Svs_Model_Exception $e) {
-			throw $e;
-		}
-		
+	public function delete($id)
+	{	
 		return $this->_mapper->delete($id);
 	}
 	
@@ -68,16 +64,17 @@ abstract class Svs_Service_Crud_Abstract
 	 * retrieves a form populated with the data of an entity.
 	 * if $flag is set to false returns an unpopulated form
 	 * 
+	 * @param	[int $id the id of the entity to fetch]
 	 * @param 	[bool $flag indicates whether or not the form will be returned with populated data] 
 	 * @return 	Svs_Form
 	 */
-	public function getPopulatedForm($flag = true)
+	public function getPopulatedForm($id = null, $flag = true)
 	{
 		$form = $this->_buildForm($this->_formType, $flag);
 		
 		if($flag){
 			$form->setSubmitLabel($this->_editLabel);
-			$form->populate($this->findById()->toArray());
+			$form->populate($this->findById($id)->toArray());
 		}
 		
 		return $form;		
@@ -105,6 +102,28 @@ abstract class Svs_Service_Crud_Abstract
 		return $this->_editLabel;
 	}
 	
+	/**
+	 * @param 	string $module the current module name
+	 * @param 	string $controller the current controller name
+	 * @return 	Svs_Service_Crud_Abstract
+	 */
+	public function setURLChunks($module, $controller)
+	{
+		$this->_module = $module;
+		$this->_controller = $controller;
+		return $this;
+	}
+	
+	public function getModule()
+	{
+		return $this->_module;
+	}
+	
+	public function getController()
+	{
+		return $this->_controller;
+	}
+	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
@@ -124,9 +143,9 @@ abstract class Svs_Service_Crud_Abstract
 	{
 		return sprintf(
 			'/%s/%s/%s',
-			$this->_request->getModuleName(),
+			$this->getModule(),
 			$action,
-			$this->_request->getControllerName()
+			$this->getController()
 		);
 	}
 	
@@ -139,9 +158,6 @@ abstract class Svs_Service_Crud_Abstract
 	 */
 	abstract protected function _convertPostToDomainObject(); 
 	
-	//-------------------------------------------------------------------------
-	// - PRIVATE
-	
 	/**
 	 * helper function: builds the form
 	 * 
@@ -150,7 +166,7 @@ abstract class Svs_Service_Crud_Abstract
 	 * @param	[string $action the action to redirect to when processing the form]
 	 * @return 	Svs_Form 
 	 */
-	private function _buildForm($form, $flag = true, $action = 'process')
+	protected function _buildForm($form, $flag = true, $action = 'process')
 	{
 		$this->setForm($form);
 		$form = $this->getForm()->setAction($this->_assembleActionURL($action));
