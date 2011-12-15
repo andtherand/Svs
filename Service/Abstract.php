@@ -68,8 +68,9 @@ abstract class Svs_Service_Abstract
 	 */
 	public function getMapper($prefix = null, $type = null)
 	{
-		if(null === $this->_mapper && null !== $prefix && null !== $type){
+		if(null !== $prefix && null !== $type){
 			try {
+				$this->_mapper = null;
 				$this->setMapper(sprintf(
 					'%s_Model_DataMapper_%s', ucfirst($prefix), ucfirst($type))
 				);
@@ -78,7 +79,6 @@ abstract class Svs_Service_Abstract
 				throw $e;				
 			}
 		}
-		
 		return $this->_mapper;
 	}
 	

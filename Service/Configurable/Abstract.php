@@ -64,6 +64,12 @@ abstract class Svs_Service_Configurable_Abstract
 	{
 		$form = null;
 		
+		// if a lazy load get should be peformed 
+		if(null !== $prefix && null !== $type){
+			$form = sprintf('%s_Form_%s', ucfirst($prefix), ucfirst($type));
+			$this->_form = null;
+		}
+		
 		// a form already exists so return immediately
 		if(null !== $this->_form){
 			return $this->_form;
@@ -72,11 +78,6 @@ abstract class Svs_Service_Configurable_Abstract
 		// if a type is defined take it
 		if(null !== $this->_formType){
 			$form = $this->_formType;	
-		}
-		
-		// if a lazy load get should be peformed 
-		if(null === $form && null !== $prefix && null !== $type){
-			$form = sprintf('%s_Form_%s', ucfirst($prefix), ucfirst($type));
 		}
 		
 		try {

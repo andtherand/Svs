@@ -24,6 +24,11 @@ class Svs_Form extends Zend_Form
 	 * @var bool	whether or not to have a hash to prevent csrf attacks
 	 */
 	protected $_preventCSRF = true;
+	
+	/**
+	 * @var bool	indicates whether or not to automatically append a submit btn 
+	 */
+	protected $_renderSubmit = true;
 		
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -68,7 +73,10 @@ class Svs_Form extends Zend_Form
 	public function setSubmitLabel($str)
 	{
 		$s = $this->getElement('submit');
-		if($s instanceof Zend_Form_Element_Submit){
+		if(
+			$s instanceof Zend_Form_Element_Button ||
+			$s instanceof Zend_Form_Element_Submit 
+		){
 			$s->setLabel($str);	
 		}
 				
@@ -104,6 +112,7 @@ class Svs_Form extends Zend_Form
 				if(
 					!$elem instanceof Zend_Form_Element_Submit 
 					|| !$elem instanceof Zend_Form_Element_Reset  
+					|| !$elem instanceof Zend_Form_Element_Button  
 				){
 					$classes = $elem->getAttrib('class');
 					$classString = $class;
@@ -147,6 +156,29 @@ class Svs_Form extends Zend_Form
 	{
 		return $this->_isInUpdateMode;
 	}
+	
+	/**
+	 * sets a flag if a submit button should be appended
+	 * provides a fluid interface
+	 * 
+	 * @param	[bool $flag sets the flag]
+	 * @return	Svs_Form 
+	 */
+	public function setRenderSubmit($flag = true)
+	{
+		$this->_renderSubmit = $flag;
+		return $this;
+	}
+	
+	/**
+	 * gets the flag if a submit btn should be appended
+	 * 
+	 * @return 	bool
+	 */
+	public function getRenderSubmit()
+	{
+		return $this->_renderSubmit;
+	}
 			
 	//-------------------------------------------------------------------------
 	// - PRIVATE
@@ -170,6 +202,10 @@ class Svs_Form extends Zend_Form
 		
 		if(true === $this->_preventCSRF){
 			$elems[] = $this->_addHashElem();
+		}
+		
+		if(true === $this->_renderSubmit){
+			$elems[] = $this->_addSubmit();
 		}
 		
 		return $elems;
@@ -218,7 +254,7 @@ class Svs_Form extends Zend_Form
 	 * 
 	 * @return Zend_Form_Element $formElement
 	 */
-	protected function _pushSubmit()
+	protected function _addSubmit()
 	{
 		$s = new Zend_Form_Element_Button('submit');
 		$s->setAttribs($this->_submitAttribs)

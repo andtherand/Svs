@@ -42,8 +42,7 @@ abstract class Svs_Service_Crud_Abstract
 		if(!$form->isValid($post)){
 			return $form;
 		}
-		
-		// all went better than expected :}
+		// everything went better than expected :}
 		return $this->_mapper->save(
 			$this->_convertPostToDomainObject()
 		);
