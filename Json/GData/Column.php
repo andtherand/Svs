@@ -137,16 +137,10 @@ class Svs_Json_Gdata_Column
 		return $this->id;
 	}
 	
-	/**
-	 * converts the column to a valid json string
-	 * 
-	 * @return string
-	 */
-	public function __toString()
+	public function toArray()
 	{
-		return json_encode($this->_data);
-	}
-	
+		return $this->_data;	
+	}	
 	
 	/**
 	 * magic method to easily convert object to json string

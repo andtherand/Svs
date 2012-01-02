@@ -53,6 +53,10 @@ class Svs_Json_GData_Rows
 			unset($tmp);
 		}
 		
+		if(is_numeric($value)){
+			$value = (int)$value;
+		}
+		
 		$tmpCell = array('v' => $value);
 		
 		if(null !== $format){
@@ -64,7 +68,7 @@ class Svs_Json_GData_Rows
 		}
 
 		$this->_cells[] = $tmpCell;
-		
+
 		return $this;
 	}
 	
@@ -93,7 +97,6 @@ class Svs_Json_GData_Rows
 		}
 		
 		return $this;
-		
 	}
 	
 	
@@ -135,8 +138,8 @@ class Svs_Json_GData_Rows
 	 */
 	public function addRow()
 	{
-		$this->_rows[] = json_encode($this->_cells);
-		$this->_cells = array();
+		$this->_rows[] = array('c' => $this->_cells);
+		$this->_cells  = array();
 		
 		return $this;
 	}
@@ -158,7 +161,7 @@ class Svs_Json_GData_Rows
 	 */
 	public function __toString()
 	{
-		return sprintf('{"c":%s}', implode('},{"c":', $this->_rows));
+		return json_encode($this->_rows);
 	}
 	
 	//-------------------------------------------------------------------------

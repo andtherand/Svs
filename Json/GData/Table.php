@@ -51,12 +51,8 @@ class Svs_Json_GData_Table
 	public function addColumn($column)
 	{
 		if(is_array($column)){
-			$column = new Svs_Json_Gdata_Column($column);
-		}
-		
-		if($column instanceof Svs_Json_Gdata_Column){
-			$this->_columns[] = (string)$column;	
-		}
+			$this->_columns[] = $column;
+		}	
 		return $this;
 	}
 	
@@ -168,28 +164,15 @@ class Svs_Json_GData_Table
 		return $this->_rows->countCells();
 	}
 	
-	/**
-	 * converts a table object to a valid json_string
-	 * 
-	 * @return 	string
-	 */
-	public function __toString()
+			
+	public function toArray()
 	{
-		$str = sprintf('"cols":[%s],', implode(',', $this->_columns));
-		$str .= sprintf('"rows":[%s]', $this->_rows);
-		return sprintf('{%s}', $str);
+		return array_merge(
+			array('cols' => $this->_columns),
+			array('rows' => $this->_rows->getRows())
+		);
 	}
-	
-	/**
-	 * a verbose cast to string uses the magic method __toString internally
-	 * 
-	 * @return	string  
-	 */
-	public function toString()
-	{
-		return (string)$this;
-	}	
-	
+		
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
@@ -199,7 +182,7 @@ class Svs_Json_GData_Table
 	protected function _init()
 	{
 		$this->_columns = array();
-		$this->_rows = new Svs_Json_Gdata_Rows();
+		$this->_rows 	= new Svs_Json_Gdata_Rows();
 	}
 	
 	//-------------------------------------------------------------------------
