@@ -13,14 +13,11 @@ abstract class Svs_Service_Abstract
 	 */
 	protected $_mapper;
 	
-	/**
-	 * hands over the params to the service layer with the result of a really thin
-	 * contoller
-	 * 
-	 *  @var 	Zend_Controller_Request_Abstract
-	 */
-	protected $_request;
-		
+    /**
+     * @var Zend_Cache_Core
+     */
+    protected $_cache;
+	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 	
@@ -108,6 +105,19 @@ abstract class Svs_Service_Abstract
 		
 		return $this;
 	}
+    
+    /**
+     * injects the cache object
+     * provides a fluid interface
+     * 
+     * @param   Zend_Cache_Core $cache
+     * @return  Svs_Service_Abstract 
+     */
+    public function setCache(Zend_Cache_Core $cache){
+        $this->_cache = $cache;
+        
+        return $this;
+    }
 	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
