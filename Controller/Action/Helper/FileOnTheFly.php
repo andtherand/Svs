@@ -35,6 +35,11 @@ class Svs_Controller_Action_Helper_FileOnTheFly
      * @var string
      */
     private $_fileName = null;
+    
+    /**
+     * @var Zend_Cache_Core
+     */
+    private $_cache = null;
     	
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -74,12 +79,17 @@ class Svs_Controller_Action_Helper_FileOnTheFly
      */
     public function save()
     {
+        $cache = false;
+        if(null !== $this->_cache){
+            $cache = true;
+            $this->_saveAndLoadFromCache();
+        }
+        
         $file = $this->_file;
-        if(!$this->_fileExists($file)){
+        if(!$this->_fileExists($file) && !$cache){
             file_put_contents($file, $this->_content);
             chmod($file, 0644);
         }
-        
         return $this;
     }
     
@@ -88,22 +98,28 @@ class Svs_Controller_Action_Helper_FileOnTheFly
      */
     public function deliverFile($fileName = null, $forceDownload = false)
     {
-        $file = $this->_content;
-        if(null !== $fileName){
+        if($this->_hasCache()){
+          $this->_fileName = $fileName;
+          $file = $this->_saveAndLoadFromCache();
+          $body = $file->content;
+          $name = $file->name . $file->extension;
+               
+        } else if(null !== $fileName){
             $this->_file = APPLICATION_PATH . $this->_path . $fileName;
-        }
-        if($this->_fileExists($file)){
-            $file = file_get_contents($this->_file);
-        }
+            
+        } 
         
-        //$fileName = $this->_fileName . $this->_extension; 
+        if($this->_fileExists($this->_file) && !$hasCache){
+            $body = file_get_contents($this->_file);
+        }
+                
         if($forceDownload){
             $this->getResponse()
-                ->setBody($file)
+                ->setBody($body)
                 ->setHeader('Content-Type', 'application/octet-stream')
                 ->setHeader('Content-Disposition', 
-                    'attachment; filename=' . $fileName)
-                ->setHeader('Content-Length', strlen($file));
+                    'attachment; filename=' . $name)
+                ->setHeader('Content-Length', strlen($body));
         }
         return $this;
     }    	
@@ -178,12 +194,54 @@ class Svs_Controller_Action_Helper_FileOnTheFly
 
         return $this;
     }
+    
+    /**
+     * sets the cache to persist the files
+     * 
+     * @param   Zend_Cache_Core $cache
+     * @return  Svs_Controller_Action_Helper_FileOnTheFly
+     */
+    public function setCache(Zend_Cache_Core $cache)
+    {
+        $this->_cache = $cache;
+        return $this;
+    }
 	
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 	
 	//-------------------------------------------------------------------------
 	// - PRIVATE
+	
+	/**
+     * checks if a cache was set
+     * @return bool
+     */
+	private function _hasCache()
+    {
+        return null !== $this->_cache;
+    }
+	
+	/**
+     * saves and loads a file from a cache
+     * 
+     * @return  stdClass 
+     */
+	private function _saveAndLoadFromCache()
+    {
+        $id = Svs_Utils_String::generateID($this->_fileName, 'fotf_');
+        if(!($file = $this->_cache->load($id))){
+            $obj = new stdClass();
+            $obj->extension = null !== $this->_extension ? $this->_extension : '';
+            $obj->content   = $this->_content;
+            $obj->name      = $this->_fileName;
+            
+            $file = $obj;
+            $this->_cache->setLifetime(3600 * 24 * 7);
+            $this->_cache->save($file, $id, array('fotf', 'export'));   
+        }
+        return $file;
+    }
 	
 	/**
      * sees if a file exists or not
