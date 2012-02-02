@@ -10,12 +10,12 @@ class Svs_Controller_Action_Helper_Navigation
 	 * @var array
 	 */
 	private $_data = array(
-		'container' => null,
+		'container'       => null,
 		'isDefaultModule' => false,
-		'suffix' => '-navigation',
-		'extension' => 'xml',
-		'class' => 'navi-btns',
-		'folder' => 'configs',
+		'suffix'          => '-navigation',
+		'extension'       => 'xml',
+		'class'           => 'navi-btns',
+		'folder'          => 'configs',
 	);
 	
 	/**
