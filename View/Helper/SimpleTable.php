@@ -3,6 +3,13 @@
 class Svs_View_Helper_SimpleTable extends Zend_View_Helper_HtmlElement
 {
 	//-------------------------------------------------------------------------
+	// - VARS
+	
+	private $_th    = null;
+  private $_tbody = null;
+  private $_id    = null;
+	
+	//-------------------------------------------------------------------------
 	// - PUBLIC 
 	
 	/**
@@ -10,8 +17,13 @@ class Svs_View_Helper_SimpleTable extends Zend_View_Helper_HtmlElement
 	 * @param array $data
 	 * @param [array $options] optional.
 	 */
-	public function simpleTable($id, Countable $data, array $options = array())
+	public function simpleTable($id, Countable $data = null, array $options = array())
 	{
+	  if($data === null){
+	    $this->_id = $id;
+	    return $this;
+	  }
+    
 		$th = null;
 		if(array_key_exists('th', $options)){
 			$th = $options['th'];
@@ -22,35 +34,47 @@ class Svs_View_Helper_SimpleTable extends Zend_View_Helper_HtmlElement
 		$html[] = '<table id="' . $id . '"' . $this->_htmlAttribs($options) . '>';
 		
 		if(null !== $th){
-			$html[] = $this->_setTableHead($th);
+			$html[] = $this->setTableHead($th);
 		}
 		
-		$html[] = $this->_setBody($data);
+		$html[] = $this->setBody($data);
 		$html[] = '</table>';
 		
 		return implode("\n", $html);
 	}
+  
+  /**
+   * @param mixed string|array 
+   * @return string
+   */
+  public function setTableHead($th)
+  {
+    $this->_th = $this->_setRow($th, 'thead');
+    return $this->_th;
+  }
+  
+  /**
+   * @param mixed array|string $data
+   * @return string
+   */
+  public function setBody($data)
+  {
+    $this->_tbody = $this->_setRow($data, 'tbody');
+    return $this->_tbody;
+  }
+  
+  public function render(array $options = array())
+  {
+    $html   = array();
+    $html[] = '<table id="' . $id . '"' . $this->_htmlAttribs($options) . '>';
+    $html[] = $this->_th;
+    $html[] = $this->_tbody;
+    $html[] = '</table>';
+    return implode("\n", $html);    
+  }
 	
 	//-------------------------------------------------------------------------
 	// - PRIVATE
-	
-	/**
-	 * @param mixed string|array 
-	 * @return string
-	 */
-	private function _setTableHead($th)
-	{
-		return $this->_setRow($th, 'thead');
-	}
-	
-	/**
-	 * @param mixed array|string $data
-	 * @return string
-	 */
-	private function _setBody($data)
-	{
-		return $this->_setRow($data, 'tbody');
-	}
 	
 	/**
 	 * @param mixed string|array $data
