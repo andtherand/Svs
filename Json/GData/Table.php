@@ -182,7 +182,7 @@ class Svs_Json_GData_Table
 	protected function _init()
 	{
 		$this->_columns = array();
-		$this->_rows 	= new Svs_Json_Gdata_Rows();
+		$this->_rows 	= new Svs_Json_GData_Rows();
 	}
 	
 	//-------------------------------------------------------------------------
