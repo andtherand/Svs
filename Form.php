@@ -52,7 +52,6 @@ class Svs_Form extends Zend_Form
 	{
 		$baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 		$action = $baseUrl . $this->_action;
-		
 		if(isset($this->_id)){
 			$this->setAttrib('id', $this->_id);
 		}
@@ -179,6 +178,19 @@ class Svs_Form extends Zend_Form
 	{
 		return $this->_renderSubmit;
 	}
+    
+     /**
+     * Set form action
+     *
+     * @param  string $action
+     * @return Zend_Form
+     */
+    public function setAction($action)
+    {
+        $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+        
+        return parent::setAction($baseUrl . $action);
+    }
 			
 	//-------------------------------------------------------------------------
 	// - PRIVATE
