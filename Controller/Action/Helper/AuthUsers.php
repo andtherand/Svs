@@ -45,7 +45,8 @@ class Svs_Controller_Action_Helper_AuthUsers
     public function isLoggedInUser()
     {
         $session = new Zend_Session_Namespace('auth');
-        return isset($session->user) && $session->user instanceof App_Model_User;
+        return isset($session->user)
+            && $session->user instanceof Svs_Model_EntityAbstract;
     }
 
     /**
