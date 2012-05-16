@@ -70,8 +70,12 @@ class Svs_Form extends Zend_Form
 			$this->setAttrib('id', $this->_id);
 		}
 
+		$this->loadDefaultDecorators();
 		$this->setAction($action)
 			 ->setMethod(self::METHOD_POST);
+
+		$defaultHtmlTag = $this->getDecorator('HtmlTag');
+		$defaultHtmlTag->setOption('class', 'svs-form');
 
 		$this->addElements($this->_addFormElements());
 		$this->_removeLabels();

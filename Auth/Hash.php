@@ -24,7 +24,8 @@
 # Obviously, since this code is in the public domain, the above are not
 # requirements (there can be none), but merely suggestions.
 #
-class Svs_Auth_Hash {
+class Svs_Auth_Hash
+{
 
 	private $itoa64;
 	private $iteration_count_log2;

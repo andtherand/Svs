@@ -4,17 +4,38 @@ class Svs_Controller_Action_Helper_AuthUsers
     extends Zend_Controller_Action_Helper_Abstract
 {
 
+    private $_tableName = 'users';
+    private $_mapperInfo = array();
+
     //--------------------------------------------------------------------------
     // - METHODS
 
+    public function __construct($tableName = null, array $mapperInfo = array())
+    {
+        if (null !== $tableName) {
+            $this->setUserTable($tableName);
+        }
+
+        if (!empty($mapperInfo)) {
+            $this->_mapperInfo = $mapperInfo;
+        }
+    }
+
+    public function setUserTable($name) {
+        $this->_tableName = $name;
+
+        return $this;
+    }
+
     public function preDispatch()
     {
-        $request = $this->getRequest();
-        $username = $request->getParam('username');
-
         $actionController = $this->getActionController();
+        $request = $this->getRequest();
 
-        if ($request->isPost() && $username) {
+        $username = $request->getParam('username');
+        $isPost = $request->isPost();
+
+        if ($isPost && $username) {
             $password = $request->getParam('password');
 
             if ($this->authenticateUser($username, $password)) {
@@ -29,13 +50,14 @@ class Svs_Controller_Action_Helper_AuthUsers
         $auth = Zend_Auth::getInstance();
         $actionName = $request->getActionName();
 
-        if (!$auth->hasIdentity() && 'login' !== $actionName) {
-            $actionController->getHelper('Redirector')->setGotoRoute(array(), 'auth');
+        if (!$auth->hasIdentity() && 'login' !== $actionName && !$isPost) {
+
+            $session = new Zend_Session_Namespace('referer');
+            $session->gotoPage = $request->getRequestUri();
+
+            $actionController->getHelper('Redirector')
+                ->setGotoRoute(array(), 'auth');
         }
-
-
-       /* $this->getActionController()->view->isLoggedInUser =
-            $this->isLoggedInUser();*/
     }
 
     /**
@@ -46,7 +68,7 @@ class Svs_Controller_Action_Helper_AuthUsers
     {
         $session = new Zend_Session_Namespace('auth');
         return isset($session->user)
-            && $session->user instanceof Svs_Model_EntityAbstract;
+            && $session->user instanceof Svs_Model_UserInterface;
     }
 
     /**
@@ -60,33 +82,33 @@ class Svs_Controller_Action_Helper_AuthUsers
         $auth = Zend_Auth::getInstance();
         $db = Zend_Db_Table::getDefaultAdapter();
 
+        $return = false;
         $idColumn = 'email';
 
-        if (false === strpos($username, '@')) {
+        if (!strpos($username, '@')) {
             $idColumn = 'name';
         }
 
-        $authAdapter = new Zend_Auth_Adapter_DbTable($db, 'users', $idColumn, 'password');
-        $authAdapter->setIdentity($username)
-            ->setCredential(hash('sha256', '23ns' . $password . 'cx89a'));
+        $authAdapter = new Svs_Auth_Adapter_Phpass(
+            new Svs_Auth_Credentials($username, $idColumn, $password),
+            $this->_mapperInfo
+        );
 
         $authResult = $auth->authenticate($authAdapter);
 
         if ($authResult->isValid()) {
 
             //valid username and password
-            $userInfo = $authAdapter->getResultRowObject();
-            var_dump($userInfo);
+            $user = $authAdapter->getAuthenticatedUser();
 
             //save userinfo in session
             $session = new Zend_Session_Namespace('auth');
-            //$session->user = $user;
+            $session->user = $user;
 
-            return true;
+            $return = true;
         }
 
-        return false;
-
+        return $return;
     }
 
     public function logout()
@@ -99,4 +121,6 @@ class Svs_Controller_Action_Helper_AuthUsers
 
         Zend_Session::forgetMe();
     }
+
+
 }
