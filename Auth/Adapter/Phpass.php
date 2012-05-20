@@ -8,7 +8,8 @@ class Svs_Auth_Adapter_Phpass implements Zend_Auth_Adapter_Interface
     protected $_mapper = null;
     protected $_user = null;
 
-    public function __construct(Svs_Auth_Credentials $cred, array $mapperInfo){
+    public function __construct(Svs_Auth_Credentials $cred, array $mapperInfo)
+    {
         $this->_identity = $cred->getName();
         $this->_fieldName = $cred->getFieldName();
         $this->_credential = $cred->getPassword();
@@ -25,7 +26,6 @@ class Svs_Auth_Adapter_Phpass implements Zend_Auth_Adapter_Interface
             ucfirst($mapperInfo['name'])
         );
     }
-
 
     public function authenticate()
     {

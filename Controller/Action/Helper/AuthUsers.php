@@ -3,23 +3,28 @@
 class Svs_Controller_Action_Helper_AuthUsers
     extends Zend_Controller_Action_Helper_Abstract
 {
+    //--------------------------------------------------------------------------
+    // - VARS
 
     private $_tableName = 'users';
     private $_mapperInfo = array();
+    private $_auth = null;
+    private $_route = array();
+
+    //--------------------------------------------------------------------------
+    // - CONSTRUCTOR
+
+    public function __construct(array $config)
+    {
+        $this->_auth = Zend_Auth::getInstance();
+
+        $this->setUserTable($config['tableName']);
+        $this->_mapperInfo = $config['mapper'];
+        $this->_route = $config['route'];
+    }
 
     //--------------------------------------------------------------------------
     // - METHODS
-
-    public function __construct($tableName = null, array $mapperInfo = array())
-    {
-        if (null !== $tableName) {
-            $this->setUserTable($tableName);
-        }
-
-        if (!empty($mapperInfo)) {
-            $this->_mapperInfo = $mapperInfo;
-        }
-    }
 
     public function setUserTable($name) {
         $this->_tableName = $name;
@@ -29,34 +34,73 @@ class Svs_Controller_Action_Helper_AuthUsers
 
     public function preDispatch()
     {
-        $actionController = $this->getActionController();
-        $request = $this->getRequest();
+        if ($this->_auth->hasIdentity()) {
 
-        $username = $request->getParam('username');
-        $isPost = $request->isPost();
+            if ('login' === $this->getRequest()->getActionName()) {
+                $route = $this->_route;
+                $action = $route['action'];
+                $controller = isset($route['controller'])
+                            ? $route['controller']
+                            : null;
+                $module = isset($route['module'])
+                        ? $route['module']
+                        : null;
+                $params = isset($route['params'])
+                        ? $route['params']
+                        : array();
 
-        if ($isPost && $username) {
-            $password = $request->getParam('password');
+                $this->getActionController()->getHelper('Redirector')
+                    ->gotoSimple($action, $controller, $module, $params);
+            }
 
-            if ($this->authenticateUser($username, $password)) {
+        } else {
+            $this->_handleNoIdentity();
 
-                            ;
+            try {
+                $this->_handleLoginAttempt();
 
-            } else {
-                $actionController->view->loginformerror = true;
+            } catch (Svs_Auth_Exception $e) {
+                // we currently don't need error handling here
             }
         }
+    }
 
-        $auth = Zend_Auth::getInstance();
+    private function _handleNoIdentity()
+    {
+        $request = $this->getRequest();
         $actionName = $request->getActionName();
 
-        if (!$auth->hasIdentity() && 'login' !== $actionName && !$isPost) {
+        if (  'login' !== $actionName
+            && !$request->isPost())
+        {
 
             $session = new Zend_Session_Namespace('referer');
             $session->gotoPage = $request->getRequestUri();
+            $session->setExpirationHops(2);
 
-            $actionController->getHelper('Redirector')
-                ->setGotoRoute(array(), 'auth');
+            $this->getActionController()->getHelper('Redirector')
+                ->setGotoRoute(array(), 'login');
+        }
+    }
+
+    /**
+     * @throws Svs_Auth_Exception when validation fails
+     */
+    private function _handleLoginAttempt()
+    {
+        $actionController = $this->getActionController();
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $username = $request->getParam('username');
+            $password = $request->getParam('password');
+
+            try {
+                $this->authenticateUser($username, $password);
+
+            } catch (Svs_Auth_Exception $e) {
+                throw $e;
+            }
         }
     }
 
@@ -75,13 +119,10 @@ class Svs_Controller_Action_Helper_AuthUsers
      *
      * @param string $username - username or email
      * @param string $password - password
-     * @return bool
+     * @throws Svs_Auth_Exception when validation fails
      */
     public function authenticateUser($username, $password)
     {
-        $auth = Zend_Auth::getInstance();
-        $db = Zend_Db_Table::getDefaultAdapter();
-
         $return = false;
         $idColumn = 'email';
 
@@ -94,21 +135,14 @@ class Svs_Controller_Action_Helper_AuthUsers
             $this->_mapperInfo
         );
 
-        $authResult = $auth->authenticate($authAdapter);
+        $authResult = $this->_auth->authenticate($authAdapter);
 
-        if ($authResult->isValid()) {
-
-            //valid username and password
-            $user = $authAdapter->getAuthenticatedUser();
-
-            //save userinfo in session
-            $session = new Zend_Session_Namespace('auth');
-            $session->user = $user;
-
-            $return = true;
+        if (!$authResult->isValid()) {
+            throw new Svs_Auth_Exception('Validation failed.');
         }
 
-        return $return;
+        $session = new Zend_Session_Namespace('auth');
+        $session->user = $authAdapter->getAuthenticatedUser();
     }
 
     public function logout()
@@ -120,7 +154,8 @@ class Svs_Controller_Action_Helper_AuthUsers
         $session->user = null;
 
         Zend_Session::forgetMe();
+
+        $this->getActionController()->getHelper('Redirector')
+            ->setGotoRoute(array(), 'login');
     }
-
-
 }
