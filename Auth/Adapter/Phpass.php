@@ -53,7 +53,7 @@ class Svs_Auth_Adapter_Phpass implements Zend_Auth_Adapter_Interface
         // Success!
         return new Zend_Auth_Result(
             Zend_Auth_Result::SUCCESS,
-            $this->_identity,
+            $this->_user,
             array()
         );
     }
