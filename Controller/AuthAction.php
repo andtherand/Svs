@@ -31,7 +31,6 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
 
                 $this->getHelper('Redirector')
                     ->gotoUrl($url);
-
             }
         }
         $this->view->form = $form;
@@ -40,7 +39,15 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
 
     public function logoutAction()
     {
-        $this->_helper->getHelper('AuthUsers')->logout();
+        $auth = Zend_Auth::getInstance();
+        $auth->clearIdentity();
+
+        $session = new Zend_Session_Namespace('auth');
+        $session->user = null;
+
+        Zend_Session::forgetMe();
+
+        $this->getHelper('Redirector')->setGotoRoute(array(), 'login');
     }
 
 }

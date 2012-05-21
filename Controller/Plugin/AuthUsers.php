@@ -1,15 +1,21 @@
 <?php
 
-class Svs_Controller_Action_Helper_AuthUsers
-    extends Zend_Controller_Action_Helper_Abstract
+class Svs_Controller_Plugin_AuthUsers
+    extends Zend_Controller_Plugin_Abstract
 {
     //--------------------------------------------------------------------------
     // - VARS
 
     private $_tableName = 'users';
+
     private $_mapperInfo = array();
+
     private $_auth = null;
+
+    private $_acl = null;
+
     private $_route = array();
+
 
     //--------------------------------------------------------------------------
     // - CONSTRUCTOR
@@ -17,6 +23,7 @@ class Svs_Controller_Action_Helper_AuthUsers
     public function __construct(array $config)
     {
         $this->_auth = Zend_Auth::getInstance();
+        $this->_acl = $config['acl'];
 
         $this->setUserTable($config['tableName']);
         $this->_mapperInfo = $config['mapper'];
@@ -32,7 +39,7 @@ class Svs_Controller_Action_Helper_AuthUsers
         return $this;
     }
 
-    public function preDispatch()
+    public function preDispatch(Zend_Controller_Request_Abstract $request)
     {
         if ($this->_auth->hasIdentity()) {
             $this->_handleIdentity();
@@ -51,7 +58,9 @@ class Svs_Controller_Action_Helper_AuthUsers
 
     private function _handleIdentity()
     {
-        if ('login' === $this->getRequest()->getActionName()) {
+        $request = $this->getRequest();
+
+        if ('login' === $request->getActionName()) {
 
             $route = $this->_route;
             $action = $route['action'];
@@ -65,9 +74,27 @@ class Svs_Controller_Action_Helper_AuthUsers
                     ? $route['params']
                     : array();
 
-            $this->getActionController()->getHelper('Redirector')
-                ->gotoSimple($action, $controller, $module, $params);
+            $redirector =
+                Zend_Controller_Action_HelperBroker::getStaticHelper(
+                    'redirector'
+                );
+
+            $redirector->gotoSimple($action, $controller, $module, $params);
         }
+
+        $role = $this->_auth->getIdentity()->getRole();
+        $resource = $request->getModuleName();
+
+        if (!$this->_acl->has($resource)) {
+            $resource = null;
+        }
+
+        if (!$this->_acl->isAllowed($role, $resource)) {
+            $response = $this->getResponse();
+            $response->setHttpResponseCode(403);
+            $response->setException(new Svs_Auth_Exception('Forbidden'));
+        }
+
     }
 
     private function _handleNoIdentity()
@@ -81,8 +108,12 @@ class Svs_Controller_Action_Helper_AuthUsers
             $session->gotoPage = $request->getRequestUri();
             $session->setExpirationHops(2);
 
-            $this->getActionController()->getHelper('Redirector')
-                ->setGotoRoute(array(), 'login');
+            $redirector =
+                Zend_Controller_Action_HelperBroker::getStaticHelper(
+                    'redirector'
+                );
+
+            $redirector->setGotoRoute(array(), 'login');
         }
     }
 
@@ -145,19 +176,5 @@ class Svs_Controller_Action_Helper_AuthUsers
 
         $session = new Zend_Session_Namespace('auth');
         $session->user = $authAdapter->getAuthenticatedUser();
-    }
-
-    public function logout()
-    {
-        $auth = Zend_Auth::getInstance();
-        $auth->clearIdentity();
-
-        $session = new Zend_Session_Namespace('auth');
-        $session->user = null;
-
-        Zend_Session::forgetMe();
-
-        $this->getActionController()->getHelper('Redirector')
-            ->setGotoRoute(array(), 'login');
     }
 }

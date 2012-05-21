@@ -79,6 +79,8 @@ class Svs_Form extends Zend_Form
 
 		$this->addElements($this->_addFormElements());
 		$this->_removeLabels();
+
+		$this->_postAssembly();
 	}
 
 	/**
@@ -233,6 +235,12 @@ class Svs_Form extends Zend_Form
     		$this->_buttonAndHiddenDecorator,
     		$noLabels
     	);
+
+    	$submit = $this->getElement('submit');
+
+    	if ($submit) {
+    		$submit->getDecorator('HtmlTag')->setOption('class', 'svs-button');
+    	}
     }
 
 
@@ -301,7 +309,9 @@ class Svs_Form extends Zend_Form
 	 * to be implemented by class who are interested on the event
 	 */
 	protected function _notifyUpdate()
-	{}
+	{
+		$this->_removeLabels();
+	}
 
 	/**
 	 * adds a submit button
@@ -317,5 +327,10 @@ class Svs_Form extends Zend_Form
 		  ->setIgnore(true)
 		  ->removeDecorator('DtDdWrapper');
 		return $s;
+	}
+
+	protected function _postAssembly()
+	{
+		// hook to be called after everything is setup
 	}
 }

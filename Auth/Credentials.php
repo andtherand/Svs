@@ -11,7 +11,7 @@ class Svs_Auth_Credentials
     {
         $this->_field = $field;
         $this->_name = $name;
-        $this->pass = $pass;
+        $this->_credentials = $pass;
     }
 
     public function getFieldName()
