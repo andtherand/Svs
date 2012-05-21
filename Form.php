@@ -254,13 +254,14 @@ class Svs_Form extends Zend_Form
 			}
         }
 
+		if (true === $this->_renderSubmit) {
+			$elems[] = $this->_addSubmit();
+		}
+
 		if (true === $this->_preventCSRF) {
 			$elems[] = $this->_addHashElem();
 		}
 
-		if (true === $this->_renderSubmit) {
-			$elems[] = $this->_addSubmit();
-		}
 
 		return $elems;
 	}
