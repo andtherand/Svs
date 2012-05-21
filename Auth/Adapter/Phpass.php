@@ -2,11 +2,17 @@
 
 class Svs_Auth_Adapter_Phpass implements Zend_Auth_Adapter_Interface
 {
+    //-------------------------------------------------------------------------
+    // - VARS
+
     protected $_identity = null;
     protected $_fieldName = null;
     protected $_credential = null;
     protected $_mapper = null;
     protected $_user = null;
+
+    //-------------------------------------------------------------------------
+    // - CONSTRUCTOR
 
     public function __construct(Svs_Auth_Credentials $cred, array $mapperInfo)
     {
@@ -17,6 +23,9 @@ class Svs_Auth_Adapter_Phpass implements Zend_Auth_Adapter_Interface
         $mapperName = $this->_normalizeMapperName($mapperInfo);
         $this->_mapper = new $mapperName();
     }
+
+    //-------------------------------------------------------------------------
+    // - METHODS
 
     private function _normalizeMapperName(array $mapperInfo)
     {
