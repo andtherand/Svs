@@ -35,26 +35,9 @@ class Svs_Controller_Action_Helper_AuthUsers
     public function preDispatch()
     {
         if ($this->_auth->hasIdentity()) {
-
-            if ('login' === $this->getRequest()->getActionName()) {
-                $route = $this->_route;
-                $action = $route['action'];
-                $controller = isset($route['controller'])
-                            ? $route['controller']
-                            : null;
-                $module = isset($route['module'])
-                        ? $route['module']
-                        : null;
-                $params = isset($route['params'])
-                        ? $route['params']
-                        : array();
-
-                $this->getActionController()->getHelper('Redirector')
-                    ->gotoSimple($action, $controller, $module, $params);
-            }
+            $this->_handleIdentity();
 
         } else {
-            $this->_handleNoIdentity();
 
             try {
                 $this->_handleLoginAttempt();
@@ -62,18 +45,38 @@ class Svs_Controller_Action_Helper_AuthUsers
             } catch (Svs_Auth_Exception $e) {
                 // we currently don't need error handling here
             }
+            $this->_handleNoIdentity();
+        }
+    }
+
+    private function _handleIdentity()
+    {
+        if ('login' === $this->getRequest()->getActionName()) {
+
+            $route = $this->_route;
+            $action = $route['action'];
+            $controller = isset($route['controller'])
+                        ? $route['controller']
+                        : null;
+            $module = isset($route['module'])
+                    ? $route['module']
+                    : null;
+            $params = isset($route['params'])
+                    ? $route['params']
+                    : array();
+
+            $this->getActionController()->getHelper('Redirector')
+                ->gotoSimple($action, $controller, $module, $params);
         }
     }
 
     private function _handleNoIdentity()
     {
         $request = $this->getRequest();
-        $actionName = $request->getActionName();
 
-        if (  'login' !== $actionName
+        if (  'login' !== $request->getActionName()
             && !$request->isPost())
         {
-
             $session = new Zend_Session_Namespace('referer');
             $session->gotoPage = $request->getRequestUri();
             $session->setExpirationHops(2);
@@ -88,7 +91,6 @@ class Svs_Controller_Action_Helper_AuthUsers
      */
     private function _handleLoginAttempt()
     {
-        $actionController = $this->getActionController();
         $request = $this->getRequest();
 
         if ($request->isPost()) {
