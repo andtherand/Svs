@@ -105,6 +105,15 @@ class Svs_Form extends Zend_Form
 	}
 
 	/**
+	 *
+	 * @return string the label of the submit button
+	 */
+	public function getSubmitLabel()
+	{
+		return $this->_submitLabel;
+	}
+
+	/**
 	 * sets the attributes of the submit button
 	 * provides a fluid interface
 	 *

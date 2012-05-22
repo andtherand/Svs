@@ -26,7 +26,10 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
             $isValid = $form->isValid($request->getPost());
             $hasIdentity = Zend_Auth::getInstance()->hasIdentity();
 
-            if ($isValid && $hasIdentity) {
+            if (!$hasIdentity) {
+                $form->populate($request->getPost());
+
+            } else if ($isValid && $hasIdentity) {
                 $url = null !== $ref ? $ref : $this->_defaultReferrer;
 
                 $this->getHelper('Redirector')
