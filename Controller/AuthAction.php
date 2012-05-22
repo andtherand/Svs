@@ -9,6 +9,8 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
 
     protected $_formAction = 'login';
 
+    protected $_loginDeniedMessage = 'Username/E-Mail and/or Password combination is wrong!';
+
     //-------------------------------------------------------------------------
     // - METHODS
 
@@ -27,7 +29,8 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
             $hasIdentity = Zend_Auth::getInstance()->hasIdentity();
 
             if (!$hasIdentity) {
-                $form->populate($request->getPost());
+                $elem = $form->getElement('password');
+                $elem->addError($this->_loginDeniedMessage);
 
             } else if ($isValid && $hasIdentity) {
                 $url = null !== $ref ? $ref : $this->_defaultReferrer;
