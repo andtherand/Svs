@@ -101,7 +101,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		if(!empty($message)){
 			$this->view->placeholder('flashMessenger')->set(
 					sprintf(
-						'<div class="messages success">%s</div>', $message[0]
+						'<div class="svs-messages messages success">%s</div>',
+                        $message[0]
 				)
 			);
 			$this->_flashMessenger->clearMessages();
