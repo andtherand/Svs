@@ -7,7 +7,7 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
 
     protected $_defaultReferrer = '/';
 
-    protected $_formAction = 'login';
+    protected $_formAction = '/login';
 
     protected $_loginDeniedMessage = 'Username/E-Mail and/or Password combination is wrong!';
 
