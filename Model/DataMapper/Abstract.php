@@ -112,6 +112,23 @@ abstract class Svs_Model_DataMapper_Abstract
 		return $this->getDbTable()->select($from);
 	}
 
+	/**
+	 * [count description]
+	 * @param  [type] $id [description]
+	 * @return [type]     [description]
+	 */
+	public function count($id = null)
+	{
+		$select = $this->getSelect()
+			->from(
+				$this->getDbTable(), array('summed' => 'COUNT(ServiceId)'));
+
+		$row = $this->_dbTable->fetchRow($select);
+
+		return (int) $row->summed;
+	}
+
+
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 
