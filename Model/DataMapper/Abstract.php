@@ -114,14 +114,16 @@ abstract class Svs_Model_DataMapper_Abstract
 
 	/**
 	 * [count description]
-	 * @param  [type] $id [description]
-	 * @return [type]     [description]
+	 * @return int the count of the first primary key
 	 */
-	public function count($id = null)
+	public function count()
 	{
+		$table = $this->getDbTable();
+		$primary = $table->info('primary');
+
 		$select = $this->getSelect()
 			->from(
-				$this->getDbTable(), array('summed' => 'COUNT(ServiceId)'));
+				$table, array('summed' => 'COUNT(' . $primary[1] . ')'));
 
 		$row = $this->_dbTable->fetchRow($select);
 
