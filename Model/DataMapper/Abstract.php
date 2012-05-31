@@ -43,7 +43,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	public function addSelect($select)
 	{
 		if(!in_array($select, $this->_selects)){
-			$this->_selects[] = $select->toString();
+			$this->_selects[] = $select->__toString();
 		}
 		return $this;
 	}
