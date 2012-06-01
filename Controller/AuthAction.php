@@ -33,7 +33,7 @@ class Svs_Controller_AuthAction extends Zend_Controller_Action
                 $elem->addError($this->_loginDeniedMessage);
 
             } else if ($isValid && $hasIdentity) {
-                $baseUrl   = Zend_Controller_Front::getInstance()->getBaseUrl();
+                $baseUrl   = Zend_Controller_Front::getInstance()->getBaseUrl() . '/';
                 $isNull    = null === $ref;
                 $isBaseUrl = $baseUrl === $ref;
 
