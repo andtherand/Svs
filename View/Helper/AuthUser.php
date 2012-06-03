@@ -12,16 +12,18 @@ class Svs_View_Helper_AuthUser extends Zend_View_Helper_Abstract
 
         if ($user instanceof Svs_Model_UserInterface) {
             $items = array(
-                'name' => $user->getName(),
-                'logout' =>
-                    '<a href="' . $this->view->url(
+                'name' => sprintf('<span>%s</span>', $user->getName()),
+                'logout' => sprintf(
+                    '<a href="%s">Logout</a>',
+                    $this->view->url(
                         array(
                             'module' => 'default',
                             'controller' => 'auth',
                             'action' => 'logout'
                         ),
                         'logout'
-                    ) . '">Logout</a>',
+                    )
+                ),
             );
             return $this->view->htmlList($items, false, array('class' => 'svs-user'), false);
         }

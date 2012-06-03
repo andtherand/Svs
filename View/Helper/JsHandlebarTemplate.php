@@ -1,6 +1,8 @@
 <?php
 
-class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_Container_Standalone
+class Svs_View_Helper_JsHandlebarTemplate
+    extends Zend_View_Helper_Placeholder_Container_Standalone
+    implements Svs_Cache_CacheableInterface
 {
     //------------------------------------------------------------------------
     // - VARS
@@ -16,6 +18,8 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
 
     private $_templateDirname = 'templates';
 
+    private $_prefix = 'hb-';
+
     //------------------------------------------------------------------------
     // - METHODS
 
@@ -25,6 +29,16 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
         $this->setSeparator(PHP_EOL);
     }
 
+    public function setCache(Zend_Cache_Core $cache)
+    {
+        $this->_cache = $cache;
+        return $this;
+    }
+
+    public function hasCache()
+    {
+        return isset($this->_cache);
+    }
 
     public function jsHandlebarTemplate($config = array())
     {
@@ -37,7 +51,6 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
         $this->_init($config);
         return $this;
     }
-
 
     public function addDirectory($dir)
     {
@@ -56,11 +69,21 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
     private function _init($config)
     {
         if (!empty($config)) {
-            $this->_cache = isset($config['cache']) ? $config['cache'] : null;
-            $this->_section = isset($config['section']) ? $config['section'] : null;
+
+            if (isset($config['cache']) && !isset($this->_cache)) {
+                $this->_cache = $config['cache'];
+            }
+
+            if (isset($config['section']) && !isset($this->_section)) {
+                $this->_section = $config['section'];
+            }
 
             if (isset($config['templateDir'])) {
                 $this->_templateDirname =  $config['templateDir'];
+            }
+
+            if (isset($config['prefix'])) {
+                $this->_prefix = $config['prefix'];
             }
         }
     }
@@ -68,7 +91,7 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
     private function _getCachedTemplates($dir)
     {
         if (null !== $this->_cache && null !== $this->_section) {
-            $cacheId = Svs_Utils_String::generateID($section, 'jstemplates_');
+            $cacheId = Svs_Utils_String::generateID($this->_section, 'jstemplates_');
 
             if (!($template = $this->_cache->load($cacheId))) {
                 // make template!
@@ -112,7 +135,8 @@ class Svs_View_Helper_JsHandlebarTemplate extends Zend_View_Helper_Placeholder_C
         $templateString = '';
         foreach ($scripts as $scriptName => $script) {
             $templateString .= sprintf(
-                '<script id="%s" type="text/x-handlebars-template">%s</script>',
+                '<script id="%s%s" type="text/x-handlebars-template">%s</script>',
+                $this->_prefix,
                 $scriptName,
                 $script
             );
