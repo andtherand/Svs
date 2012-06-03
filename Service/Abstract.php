@@ -70,9 +70,7 @@ abstract class Svs_Service_Abstract
 		if(null !== $prefix && null !== $type){
 			try {
 				$this->_mapper = null;
-				$this->setMapper(sprintf(
-					'%s_Model_DataMapper_%s', ucfirst($prefix), ucfirst($type))
-				);
+				$this->setMapper($prefix, $type);
 
 			} catch(Svs_Service_Exception $e){
 				throw $e;
@@ -91,10 +89,16 @@ abstract class Svs_Service_Abstract
 	 * @throws 	Svs_Service_Exception	when a given mapper class does not exist
 	 * @return 	Svs_Model_Service_Abstract
 	 */
-	public function setMapper($mapper)
+	public function setMapper($prefix, $type)
 	{
-
 		$mapperInstance = null;
+		$mapper = sprintf(
+			'%s_Model_DataMapper_%s',
+			ucfirst($prefix),
+			ucfirst($type)
+		);
+		$mapperId = $prefix . '_' . $type;
+
 		if(is_string($mapper)){
 			if(!class_exists($mapper)){
 				throw new Svs_Service_Exception(
@@ -104,10 +108,10 @@ abstract class Svs_Service_Abstract
 
 			if (!array_key_exists($mapper, $this->_mappers)) {
 				$mapperInstance = new $mapper();
-				$this->_mappers[$mapper] = $mapperInstance;
+				$this->_mappers[$mapperId] = $mapperInstance;
 
 			} else {
-				$mapperInstance = $this->_mappers[$mapper];
+				$mapperInstance = $this->_mappers[$mapperId];
 			}
 		}
 
