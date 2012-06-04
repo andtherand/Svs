@@ -116,7 +116,7 @@ abstract class Svs_Model_DataMapper_Abstract
 	 * [count description]
 	 * @return int the count of the first primary key
 	 */
-	public function count()
+	public function count($where = null)
 	{
 		$table = $this->getDbTable();
 		$primary = $table->info('primary');
@@ -124,6 +124,10 @@ abstract class Svs_Model_DataMapper_Abstract
 		$select = $this->getSelect()
 			->from(
 				$table, array('summed' => 'COUNT(' . $primary[1] . ')'));
+
+		if (null !== $where) {
+			$select->where($where);
+		}
 
 		$row = $this->_dbTable->fetchRow($select);
 
