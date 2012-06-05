@@ -45,10 +45,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	 */
 	protected $_redirector = null;
 
-	/**
-	 * @var Zend_Controller_Action_Helper_FlashMessenger
-	 */
-	protected $_flashMessenger = null;
+    protected $_messenger = null;
 
 	/**
 	 * @var Zend_Session_Namespace
@@ -70,47 +67,40 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	public function init()
 	{
 		$request = $this->getRequest();
-		$this->_controller 	= strtolower($request->getControllerName());
-		$this->_module 		= strtolower($request->getModuleName());
+		$this->_controller = strtolower($request->getControllerName());
+		$this->_module = strtolower($request->getModuleName());
 
 		$this->_service->setURLChunks(
 			$this->_module, $this->_controller
 		);
 
-		$this->_namespace 		= new Zend_Session_Namespace('crud');
-		$this->_flashMessenger 	= $this->getHelper('FlashMessenger');
-		$this->_redirector 		= $this->getHelper('redirector');
-		$this->_viewRenderer	= $this->getHelper('viewRenderer');
+		$this->_namespace = new Zend_Session_Namespace('crud');
+		$this->_redirector = $this->getHelper('redirector');
+		$this->_viewRenderer = $this->getHelper('viewRenderer');
 
-	}
 
-	/**
-	 * just a redirect to the list action
-	 */
-	public function indexAction()
-	{
-		$this->_redirector->gotoRoute(array(), $this->_defaultRedirectRoute);
-	}
+    }
 
-	/**
+    /**
+     * just a redirect to the list action
+     */
+    public function indexAction()
+    {
+        $this->_redirectToDefault();
+    }
+
+    /**
      * lists all services found
      */
     public function listAction()
     {
-    	$message = $this->_flashMessenger->getMessages();
-		if(!empty($message)){
-			$this->view->placeholder('flashMessenger')->set(
-					sprintf(
-						'<div class="svs-messages messages success">%s</div>',
-                        $message[0]
-				)
-			);
-			$this->_flashMessenger->clearMessages();
-			// disables the back button for 1 hop
-			$this->_namespace->noBackButton = true;
-			$this->_namespace->setExpirationHops(1);
-		}
-
+        $this->_messenger = $this->getHelper('MessengerPigeon');
+        //var_dump($this->_messenger);
+		// if($this->_messenger->broadcast()){
+		// 	// disables the back button for 1 hop
+		// 	$this->_namespace->noBackButton = true;
+		// 	$this->_namespace->setExpirationHops(1);
+		// }
 
 		$this->view->assign(array(
 				'partialName' => sprintf(
@@ -154,10 +144,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 
     	// check if the backButton is diabled if so redirect
 		if(isset($this->_namespace->noBackButton)){
-			$this->_redirector->gotoRouteAndExit(
-				array('controller' => $this->_controller),
-				$this->_defaultRedirectRoute
-			);
+			$this->_redirectToDefault();
 		}
     	$this->view->form =	$this->_service->getPopulatedForm(null, false);
        	$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
@@ -181,29 +168,23 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
      */
     public function processAction()
     {
-    	$this->getHelper('viewRenderer')->setNoRender();
+        $this->_viewRenderer->setNoRender();
+        // if request is get redirect to the list action
+        if(!$this->getRequest()->isPost()){
+            $this->_redirectToDefault();
+        }
 
-    	// if request is get redirect to the list action
-    	if(!$this->getRequest()->isPost()){
-    		$this->_redirector->gotoRoute(
-    			array('controller' => $this->_controller),
-    			$this->_defaultRedirectRoute
-			);
-    	}
+        $result = $this->_service->save($this->getRequest()->getPost());
 
-		$result = $this->_service->save($this->getRequest()->getPost());
+        // something has gone wrong, so show the form again
+        if($result instanceof Zend_Form){
+            $this->view->form = $result;
+            $this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
 
-		// somethings gone wrong, so show the form again
-		if($result instanceof Zend_Form){
-			$this->view->form = $result;
-			$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
-
-		} else {
-			$this->_flashMessenger->addMessage($this->_successMessage);
-			$this->_redirector->gotoRouteAndExit(
-				array('controller' => $this->_controller),
-				$this->_defaultRedirectRoute
-			);
+        } else {
+   //          $this->_messenger = $this->getHelper('MessengerPigeon');
+			// $this->_messenger->addMessage($this->_successMessage);
+			$this->_redirectToDefault();
 
 		}
     }
@@ -221,11 +202,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     		throw $e;
     	}
 
-		$this->_flashMessenger->addMessage($this->_deleteMessage);
-       	$this->_redirector->gotoRouteAndExit(
-       		array('controller' => $this->_controller),
-       		$this->_defaultRedirectRoute
-		);
+		$this->_messenger->addMessage($this->_deleteMessage);
+       	$this->_redirectToDefault();
     }
 
 	//-------------------------------------------------------------------------
@@ -234,4 +212,14 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	//-------------------------------------------------------------------------
 	// - PRIVATE
 
+    private function _redirectToDefault()
+    {
+        $this->_redirector->gotoRouteAndExit(
+            array(
+                'module' => $this->_module,
+                'controller' => $this->_controller,
+            ),
+            $this->_defaultRedirectRoute
+        );
+    }
 }
