@@ -60,6 +60,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	 */
 	protected $_viewRenderer = null;
 
+    protected $_entriesPerPage = 25;
+
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 
@@ -122,7 +124,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		/**
 		 * @var Svs_Controller_Action_Helper_Paginator
 		 */
-		$this->_helper->paginator($this->_service->findAll(), 10);
+		$this->_helper->paginator($this->_service->findAll(), $this->_entriesPerPage);
 
 		$this->_viewRenderer->render($this->_viewFolder . '/list', null, true);
     }

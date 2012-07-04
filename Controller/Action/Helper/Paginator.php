@@ -1,14 +1,14 @@
 <?php
 
-class Svs_Controller_Action_Helper_Paginator 
+class Svs_Controller_Action_Helper_Paginator
 	extends Zend_Controller_Action_Helper_Abstract
 {
 	//-------------------------------------------------------------------------
 	// -- PUBLIC
-	
+
 	/**
 	 * strategy pattern
-	 * 
+	 *
 	 * @param array $result
 	 * @param [int $itemsPerPage]
 	 * @param [string $scrollStyle]
@@ -19,14 +19,16 @@ class Svs_Controller_Action_Helper_Paginator
 	)
 	{
 		$view = $this->getActionController()->view;
-				
+		$request = $this->getRequest();
+
 		Zend_Paginator::setDefaultScrollingStyle($scrollStyle);
 		$paginator = Zend_Paginator::factory($result);
-				
-		$paginator->setItemCountPerPage($itemsPerPage);
-		$paginator->setCurrentPageNumber(
-			$this->getRequest()->getParam('page', 1));
-		
-		$view->paginator = $paginator;	
-	}	
+
+		$perPage = $request->getParam('perpage', $itemsPerPage);
+
+		$paginator->setItemCountPerPage($perPage);
+		$paginator->setCurrentPageNumber($request->getParam('page', 1));
+
+		$view->paginator = $paginator;
+	}
 }
