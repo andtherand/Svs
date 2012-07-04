@@ -79,8 +79,6 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		$this->_namespace = new Zend_Session_Namespace('crud');
 		$this->_redirector = $this->getHelper('redirector');
 		$this->_viewRenderer = $this->getHelper('viewRenderer');
-
-
     }
 
     /**
@@ -97,12 +95,12 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     public function listAction()
     {
         $this->_messenger = $this->getHelper('MessengerPigeon');
-        //var_dump($this->_messenger);
-		// if($this->_messenger->broadcast()){
-		// 	// disables the back button for 1 hop
-		// 	$this->_namespace->noBackButton = true;
-		// 	$this->_namespace->setExpirationHops(1);
-		// }
+
+		if ($this->_messenger->broadcast()) {
+			// disables the back button for 1 hop
+			$this->_namespace->noBackButton = true;
+			$this->_namespace->setExpirationHops(1);
+		}
 
 		$this->view->assign(array(
 				'partialName' => sprintf(
@@ -184,8 +182,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
             $this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
 
         } else {
-   //          $this->_messenger = $this->getHelper('MessengerPigeon');
-			// $this->_messenger->addMessage($this->_successMessage);
+            $this->_messenger = $this->getHelper('MessengerPigeon');
+			$this->_messenger->addMessage($this->_successMessage);
 			$this->_redirectToDefault();
 
 		}

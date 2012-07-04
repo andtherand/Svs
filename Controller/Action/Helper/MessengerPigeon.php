@@ -10,17 +10,15 @@ class Svs_Controller_Action_Helper_MessengerPigeon
 
     public function direct()
     {
-      $this->_initMessenger();
-
+        $this->_initMessenger();
         return $this;
     }
 
     private function _initMessenger()
     {
         $action = $this->getActionController();
-        var_dump($this->_actionController);
-        // $this->_fm = $action->getHelper('FlashMessenger');
-        // $this->_view = $action->view;
+        $this->_fm = $action->getHelper('FlashMessenger');
+        $this->_view = $action->view;
     }
 
     /**
@@ -29,6 +27,8 @@ class Svs_Controller_Action_Helper_MessengerPigeon
      */
     public function broadcast()
     {
+        $this->_initMessenger();
+
         $messages = $this->_fm->getMessages();
         $broadcast = false;
 
@@ -48,6 +48,7 @@ class Svs_Controller_Action_Helper_MessengerPigeon
 
     public function addMessage($message)
     {
+        $this->_initMessenger();
         $this->_fm->addMessage($message);
         return $this;
     }
