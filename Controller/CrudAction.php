@@ -59,6 +59,10 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 
     protected $_entriesPerPage = 25;
 
+    protected $_hasCache = false;
+
+    protected $_cacheTags = array();
+
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 
@@ -75,6 +79,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		$this->_service->setURLChunks(
 			$this->_module, $this->_controller
 		);
+        $this->_hasCache = $this->_helper->cacheInjector($this->_service);
 
 		$this->_namespace = new Zend_Session_Namespace('crud');
 		$this->_redirector = $this->getHelper('redirector');
@@ -184,9 +189,24 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
         } else {
             $this->_messenger = $this->getHelper('MessengerPigeon');
 			$this->_messenger->addMessage($this->_successMessage);
+            $this->_deleteCache();
 			$this->_redirectToDefault();
 
 		}
+    }
+
+    protected function _deleteCache()
+    {
+        if (!$this->_hasCache) {
+            return false;
+        }
+
+        if (!empty($this->_cacheTags)) {
+            $this->_service->getCache()->clean(
+                Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG,
+                $this->_cacheTags
+            );
+        }
     }
 
 	/**
@@ -209,10 +229,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	//-------------------------------------------------------------------------
 	// - PROTECTED
 
-	//-------------------------------------------------------------------------
-	// - PRIVATE
-
-    private function _redirectToDefault()
+    protected function _redirectToDefault()
     {
         $this->_redirector->gotoRouteAndExit(
             array(

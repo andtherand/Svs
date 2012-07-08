@@ -139,6 +139,11 @@ abstract class Svs_Service_Abstract
         return $this;
     }
 
+    public function getCache()
+    {
+    	return $this->_cache;
+    }
+
     /**
      * checks if a cache has been set
      *
