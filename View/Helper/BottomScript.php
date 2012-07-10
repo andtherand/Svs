@@ -26,7 +26,7 @@ class Svs_View_Helper_BottomScript extends Zend_View_Helper_HeadScript
 
     private function _retrieveBaseUrl()
     {
-       $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
+        $baseUrl = Zend_Controller_Front::getInstance()->getBaseUrl();
 
         if (null !== $baseUrl) {
             $this->_baseUrl = $baseUrl . '/';
@@ -60,7 +60,9 @@ class Svs_View_Helper_BottomScript extends Zend_View_Helper_HeadScript
         return $this;
     }
 
-
-
-
+    public function prependScript($script)
+    {
+        parent::prependScript($script);
+        return $this;
+    }
 }
