@@ -106,10 +106,21 @@ class Svs_Utils_String
 	 */
 	public static function addBaseUrl($url, $baseUrl)
 	{
-		if(preg_match('/http*/', $url)){
-			return $url;
+		$return = $url;
+		if (preg_match('/http*/', $url, $hits)) {
+			return str_replace(array('https:', 'http:'), array('', ''), $return);
 		}
-		return $baseUrl . $url;
-	}
 
+		if ('development' === APPLICATION_ENV) {
+			$baseUrl = $_SERVER['SERVER_NAME'] . '/';
+			$return = $baseUrl . $url;
+			$return = str_replace('//', '/', $return);
+			$return = '//' . $return;
+
+		} else {
+			$return = $baseUrl . $url;
+		}
+
+		return $return;
+	}
 }
