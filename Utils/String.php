@@ -118,7 +118,7 @@ class Svs_Utils_String
 			$return = '//' . $return;
 
 		} else {
-			$return = $baseUrl . $url;
+			$return = '//' . $_SERVER['SERVER_NAME'] . $baseUrl . $url;
 		}
 
 		return $return;
