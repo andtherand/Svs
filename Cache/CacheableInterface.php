@@ -6,4 +6,6 @@ interface Svs_Cache_CacheableInterface {
 
     public function hasCache();
 
+    public function setCacheTags(array $tags = array());
+
 }

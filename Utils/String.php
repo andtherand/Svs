@@ -11,7 +11,7 @@
  *	A utils class to check strings against certain states
  */
 
-class Svs_Utils_String 
+class Svs_Utils_String
 {
 	// ---------------------------------------------
 	//	- STATIC
@@ -46,7 +46,7 @@ class Svs_Utils_String
 
 		return '#' . strtoupper($hr . $hg . $hb);
 	}
-	
+
 	/**
 	 * generates an id given through the input
 	 * @param string $input
@@ -59,6 +59,13 @@ class Svs_Utils_String
 		$id = sprintf('%s%s%s', $prefix, md5($input), $suffix);
 		return $id;
 	}
+
+
+	public static function generateCacheId($str1, $str2)
+    {
+        $prefix = sprintf('%s_%s', $str1, $str2);
+        return Svs_Utils_String::generateID($prefix, $prefix . '_');
+    }
 
 	/**
 	 * replaces unwanted chars with ascii chars - replaces special chars with dashes '-'
@@ -90,12 +97,12 @@ class Svs_Utils_String
 	}
 
 	/**
-	 * adds the base url to a resource if it´s necessary otherwise returns 
+	 * adds the base url to a resource if it´s necessary otherwise returns
 	 * the given resource path
-	 * 
+	 *
 	 * @param 	string $url the resource url
 	 * @param 	string $baseUrl the baseUrl to add
-	 * @return 	string 
+	 * @return 	string
 	 */
 	public static function addBaseUrl($url, $baseUrl)
 	{

@@ -20,6 +20,10 @@ abstract class Svs_Service_Abstract
      */
     protected $_cache;
 
+    protected $_cacheTags = array();
+
+    protected $_cacheId = null;
+
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 
@@ -39,8 +43,54 @@ abstract class Svs_Service_Abstract
 	 */
 	public function findAll($criteria = null)
 	{
-		return $this->_mapper->findAll($criteria);
+        if ($this->hasCache()) {
+            $it = $this->_findAll($criteria);
+
+        } else {
+            $it = $this->_mapper->findAll($criteria);
+        }
+
+		return $it;
 	}
+
+    private function _findAll($criteria)
+    {
+        $hasExtras = $this->_extractCriteriasForCache($criteria);
+        $extras = '';
+
+        if ($hasExtras) {
+            $extras = $hasExtras;
+        }
+
+        $cacheId = Svs_Utils_String::generateCacheId($this->_cacheId, __FUNCTION__);
+        if (!($it = $this->_cache->load($cacheId))) {
+
+            try {
+                $it = $this->_mapper->findAll($criteria);
+                $this->_cache->save($it, $cacheId, $this->_cacheTags);
+
+            } catch (Svs_Service_Exception $e) {
+                throw $e;
+            }
+        }
+
+        return $it;
+    }
+
+    private function _extractCriteriasForCache($criteria)
+    {
+        if (!is_array($criteria)) {
+            return false;
+
+        }
+        $extras = '';
+
+        foreach ($criteria as $extra) {
+            $extra .= $extra;
+        }
+
+        return $extras;
+    }
 
 	/**
 	 * checks if a request has been set and if an id has been provided
@@ -53,8 +103,32 @@ abstract class Svs_Service_Abstract
 	 */
 	public function findById($id)
 	{
-		return $this->_mapper->findById($id);
+        if ($this->hasCache()) {
+            $entity = $this->_findById($id);
+
+        } else {
+            $entity = $this->_mapper->findById($id);
+        }
+
+        return $entity;
 	}
+
+    private function _findById($id)
+    {
+        $cacheId = Svs_Utils_String::generateCacheId($this->_cacheId . '_' . $id, __FUNCTION__);
+        if (!($entity = $this->_cache->load($cacheId))) {
+
+            try {
+                $entity = $this->_mapper->findById($id);
+                $this->_cache->save($entity, $cacheId, $this->_cacheTags);
+
+            } catch (Svs_Service_Exception $e) {
+                throw $e;
+            }
+        }
+
+        return $entity;
+    }
 
 	/**
 	 * retrieves a set mapper or lazyloads and sets a mapper
@@ -152,6 +226,12 @@ abstract class Svs_Service_Abstract
     public function hasCache()
     {
         return isset($this->_cache);
+    }
+
+    public function setCacheTags(array $tags = array())
+    {
+        $this->_cacheTags += $tags;
+        return $this;
     }
 
 	//-------------------------------------------------------------------------

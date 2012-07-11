@@ -53,6 +53,12 @@ class Svs_Controller_Action_Helper_CacheInjector
 		return $hasCache;
 	}
 
+	public function setCacheTags($tags)
+	{
+		$this->_cacheable->setCacheTags($tags);
+		return $this;
+	}
+
 	//-------------------------------------------------------------------------
 	// - PRIVATE
 

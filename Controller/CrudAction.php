@@ -82,6 +82,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 			$this->_module, $this->_controller
 		);
         $this->_hasCache = $this->_helper->cacheInjector($this->_service);
+        $this->_helper->cacheInjector()->setCacheTags($this->_cacheTags);
 
 		$this->_namespace = new Zend_Session_Namespace('crud');
 		$this->_redirector = $this->getHelper('redirector');

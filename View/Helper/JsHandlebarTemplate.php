@@ -20,6 +20,8 @@ class Svs_View_Helper_JsHandlebarTemplate
 
     private $_prefix = 'hb-';
 
+    private $_cacheTags = array('infrastructure');
+
     //------------------------------------------------------------------------
     // - METHODS
 
@@ -38,6 +40,12 @@ class Svs_View_Helper_JsHandlebarTemplate
     public function hasCache()
     {
         return isset($this->_cache);
+    }
+
+    public function setCacheTags(array $tags = array())
+    {
+        $this->_cacheTags += $tags;
+        return $this;
     }
 
     public function jsHandlebarTemplate($config = array())
@@ -98,7 +106,7 @@ class Svs_View_Helper_JsHandlebarTemplate
                 $template = $this->renderScriptTags($dir);
             }
 
-            $this->_cache->save($template, $cacheId, array('infrastructure'));
+            $this->_cache->save($template, $cacheId, array($this->_cacheTags));
 
             return $template;
         }

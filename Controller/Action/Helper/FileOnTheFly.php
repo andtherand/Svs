@@ -42,6 +42,8 @@ class Svs_Controller_Action_Helper_FileOnTheFly
      */
     private $_cache = null;
 
+    private $_cacheTags = array('ftof', 'export');
+
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 
@@ -215,6 +217,13 @@ class Svs_Controller_Action_Helper_FileOnTheFly
     {
         return null !== $this->_cache;
     }
+
+    public function setCacheTags(array $tags = array())
+    {
+        $this->_cacheTags += $tags;
+        return $this;
+     }
+
     //-------------------------------------------------------------------------
     // - PROTECTED
 
@@ -230,6 +239,7 @@ class Svs_Controller_Action_Helper_FileOnTheFly
 	private function _saveAndLoadFromCache()
     {
         $id = Svs_Utils_String::generateID($this->_fileName, 'fotf_');
+
         if(!($file = $this->_cache->load($id))){
             $obj = new stdClass();
             $obj->extension = null !== $this->_extension ? $this->_extension : '';
