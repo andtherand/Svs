@@ -63,6 +63,8 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 
     protected $_cacheTags = array();
 
+    protected $_findAllCriteria = null;
+
 	//-------------------------------------------------------------------------
 	// - PUBLIC
 
@@ -117,7 +119,10 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		/**
 		 * @var Svs_Controller_Action_Helper_Paginator
 		 */
-		$this->_helper->paginator($this->_service->findAll(), $this->_entriesPerPage);
+		$this->_helper->paginator(
+            $this->_service->findAll($this->_findAllCriteria),
+            $this->_entriesPerPage
+        );
 
 		$this->_viewRenderer->render($this->_viewFolder . '/list', null, true);
     }

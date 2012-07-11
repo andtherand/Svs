@@ -134,9 +134,47 @@ abstract class Svs_Model_DataMapper_Abstract
 		return (int) $row->summed;
 	}
 
+	/**
+	 * fetches all entites from the database
+	 *
+	 * @see 	Svs_Model_DataMapperInterface
+	 * @return 	App_Model_Group_Groups
+	 */
+	public function findAll($criteria = null)
+	{
+		$softDeleted = 'deleted = 0';
+
+		if (is_array($criteria)) {
+
+			$operation = $criteria['operation'];
+			$select = $this->getSelect();
+			$select->where($softDeleted);
+
+			if (method_exists($select, $operation)) {
+				$select->$operation($criteria['value']);
+			}
+			$criteria = $select;
+
+		} else if(null === $criteria){
+			$criteria = $this->getSelect()->where($softDeleted);
+
+		} else {
+			$criteria->where($softDeleted);
+
+		}
+
+		return $this->_createCollection(
+			$this->_dbTable->fetchAll($criteria)
+		);
+	}
 
 	//-------------------------------------------------------------------------
 	// - PROTECTED
+
+	protected function _createCollection($resultSet)
+	{
+		return $this->_createCollection($resultSet);
+	}
 
 	/**
 	 * initializes the mapper

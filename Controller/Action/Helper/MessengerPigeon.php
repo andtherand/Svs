@@ -46,9 +46,10 @@ class Svs_Controller_Action_Helper_MessengerPigeon
         return $broadcast;
     }
 
-    public function addMessage($message)
+    public function addMessage($message, $type = 'success')
     {
         $this->_initMessenger();
+        $this->_messageType = $type;
         $this->_fm->addMessage($message);
         return $this;
     }
