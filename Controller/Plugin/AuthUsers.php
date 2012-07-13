@@ -33,7 +33,8 @@ class Svs_Controller_Plugin_AuthUsers
     //--------------------------------------------------------------------------
     // - METHODS
 
-    public function setUserTable($name) {
+    public function setUserTable($name)
+    {
         $this->_tableName = $name;
 
         return $this;
