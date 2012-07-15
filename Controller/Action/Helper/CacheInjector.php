@@ -13,6 +13,7 @@ class Svs_Controller_Action_Helper_CacheInjector
 	private $_manager = null;
 	private $_cacheable = null;
 	private $_regKey = 'cache';
+	private static $IS_CACHE_ON = false;
 
 	//-------------------------------------------------------------------------
 	// - PUBLIC
@@ -31,7 +32,13 @@ class Svs_Controller_Action_Helper_CacheInjector
 		return $this->_cache;
 	}
 
-
+	/**
+	 * strategy pattern
+	 * @param  Svs_Cache_CacheableInterface $cacheable everything that can be cached
+	 * @param  string $cacheType
+	 * @param  string $regKey
+	 * @return bool
+	 */
 	public function direct(Svs_Cache_CacheableInterface $cacheable = null, $cacheType = 'filecache', $regKey = 'cache')
 	{
 		if (null === $cacheable) {
@@ -43,13 +50,12 @@ class Svs_Controller_Action_Helper_CacheInjector
 			->getResource('cachemanager');
 
 		$hasCache = false;
-
 		if (null !== $this->_manager) {
 			$this->_cacheable = $cacheable;
 			$this->getCache($cacheType);
 			$hasCache = $this->_injectCache();
-
 		}
+
 		return $hasCache;
 	}
 
@@ -64,8 +70,7 @@ class Svs_Controller_Action_Helper_CacheInjector
 
 	private function _injectCache()
 	{
-		$isCacheActive = Zend_Registry::get('config')->get($this->_regKey);
-		if ($isCacheActive) {
+		if (self::$IS_CACHE_ON) {
 
         	$this->_cacheable->setCache($this->_cache);
         }
@@ -73,6 +78,10 @@ class Svs_Controller_Action_Helper_CacheInjector
         return $this->_cacheable->hasCache();
 	}
 
+	public static function enable($on)
+	{
+		self::$IS_CACHE_ON = $on;
+	}
 
 
 }

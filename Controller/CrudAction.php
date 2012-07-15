@@ -87,6 +87,10 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 		$this->_namespace = new Zend_Session_Namespace('crud');
 		$this->_redirector = $this->getHelper('redirector');
 		$this->_viewRenderer = $this->getHelper('viewRenderer');
+
+        $config  = Zend_Registry::get('config');
+        $perPage = $config->get('customOptions')->get('lists')->get('perpage', $this->_entriesPerPage);
+        $this->_entriesPerPage = $perPage;
     }
 
     /**
