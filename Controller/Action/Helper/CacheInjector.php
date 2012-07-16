@@ -50,6 +50,7 @@ class Svs_Controller_Action_Helper_CacheInjector
 			->getResource('cachemanager');
 
 		$hasCache = false;
+
 		if (null !== $this->_manager) {
 			$this->_cacheable = $cacheable;
 			$this->getCache($cacheType);

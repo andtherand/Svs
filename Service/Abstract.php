@@ -86,7 +86,7 @@ abstract class Svs_Service_Abstract
         $extras = '';
 
         foreach ($criteria as $extra) {
-            $extra .= $extra;
+            $extras .= $extra;
         }
 
         return $extras;
@@ -207,7 +207,8 @@ abstract class Svs_Service_Abstract
      * @param   Zend_Cache_Core $cache
      * @return  Svs_Service_Abstract
      */
-    public function setCache(Zend_Cache_Core $cache){
+    public function setCache(Zend_Cache_Core $cache)
+    {
         $this->_cache = $cache;
 
         return $this;
@@ -231,6 +232,15 @@ abstract class Svs_Service_Abstract
     public function setCacheTags(array $tags = array())
     {
         $this->_cacheTags += $tags;
+        return $this;
+    }
+
+    public function setLifetime($lifetime = 3600)
+    {
+        if ($this->hasCache()) {
+            $this->_cache->setLifetime($lifetime);
+        }
+
         return $this;
     }
 

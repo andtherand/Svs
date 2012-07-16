@@ -100,13 +100,12 @@ class Svs_View_Helper_JsHandlebarTemplate
     {
         if (null !== $this->_cache && null !== $this->_section) {
             $cacheId = Svs_Utils_String::generateID($this->_section, 'jstemplates_');
-
             if (!($template = $this->_cache->load($cacheId))) {
                 // make template!
                 $template = $this->renderScriptTags($dir);
             }
 
-            $this->_cache->save($template, $cacheId, array($this->_cacheTags));
+            $this->_cache->save($template, $cacheId, $this->_cacheTags);
 
             return $template;
         }
