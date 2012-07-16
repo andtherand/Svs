@@ -24,7 +24,7 @@ class Svs_Controller_Action_Helper_Paginator
 		Zend_Paginator::setDefaultScrollingStyle($scrollStyle);
 		$paginator = Zend_Paginator::factory($result);
 
-		$paginator->setItemCountPerPage($itemsPerPage);
+		$paginator->setItemCountPerPage($request->getParam('perpage', $itemsPerPage));
 		$paginator->setCurrentPageNumber($request->getParam('page', 1));
 
 		$view->paginator = $paginator;
