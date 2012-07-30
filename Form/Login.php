@@ -19,7 +19,7 @@ class Svs_Form_Login extends Svs_Form
     /**
      * @var array
      */
-    protected $_submitAttribs = array('class' => 'call-to-action');
+    protected $_submitAttribs = array('class' => 'action-btn call-to-action');
 
     //--------------------------------------------------------------------------
     // - METHODS
