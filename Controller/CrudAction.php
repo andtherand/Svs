@@ -144,6 +144,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     	} catch(Svs_Service_Exception $e){
     		throw $e;
     	}
+
 		$this->view->partialName = sprintf(
 			'partials/%s-show.phtml', $this->_controller
 		);
@@ -158,9 +159,10 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     	$this->_helper->noCacheHeader();
 
     	// check if the backButton is diabled if so redirect
-		if(isset($this->_namespace->noBackButton)){
+		if (isset($this->_namespace->noBackButton)) {
 			$this->_redirectToDefault();
 		}
+
     	$this->view->form =	$this->_service->getPopulatedForm(null, false);
        	$this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
     }
@@ -185,14 +187,14 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     {
         $this->_viewRenderer->setNoRender();
         // if request is get redirect to the list action
-        if(!$this->getRequest()->isPost()){
+        if (!$this->getRequest()->isPost()) {
             $this->_redirectToDefault();
         }
 
         $result = $this->_service->save($this->getRequest()->getPost());
 
         // something has gone wrong, so show the form again
-        if($result instanceof Zend_Form){
+        if ($result instanceof Zend_Form) {
             $this->view->form = $result;
             $this->_viewRenderer->render($this->_viewFolder . '/form', null, true);
 
@@ -226,14 +228,16 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
     {
         $this->_messenger = $this->getHelper('MessengerPigeon');
     	$requestId = $this->getRequest()->getParam('id');
+
     	try {
     		$id = $this->_service->delete($requestId);
 
-    	} catch(Svs_Model_Exception $e){
+    	} catch(Svs_Model_Exception $e) {
     		throw $e;
     	}
 
-		$this->_messenger->addMessage($this->_deleteMessage);
+        $this->_deleteCache();
+        $this->_messenger->addMessage($this->_deleteMessage);
        	$this->_redirectToDefault();
     }
 
