@@ -224,6 +224,7 @@ class Svs_Controller_CrudAction extends Zend_Controller_Action
 	 */
     public function deleteAction()
     {
+        $this->_messenger = $this->getHelper('MessengerPigeon');
     	$requestId = $this->getRequest()->getParam('id');
     	try {
     		$id = $this->_service->delete($requestId);
